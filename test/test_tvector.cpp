@@ -161,3 +161,9 @@ TEST(TVector, cant_multiply_vectors_with_not_equal_size)
   ADD_FAILURE();
 }
 
+
+TEST(Test, can_add_two_numbers)
+{
+  ASSERT_EQ(5, 2+3);
+}
+
