@@ -269,7 +269,7 @@ TMatrix<ValType>& TMatrix<ValType>::operator=(const TMatrix<ValType> &mt)
 		}
 		this->Size=mt.Size;
 		this->StartIndex=mt.StartIndex;
-		for (int i=0; i<Size; i++) this->pVector[i]=mt.pVector[i];
+		for (int i=0; i<(this->Size); i++) this->pVector[i]=mt.pVector[i];
 		return *this;
 	}
 } /*-------------------------------------------------------------------------*/
