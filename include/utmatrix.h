@@ -137,62 +137,61 @@ TVector<ValType>& TVector<ValType>::operator=(const TVector &v)
 template <class ValType> // прибавить скаляр
 TVector<ValType> TVector<ValType>::operator+(const ValType &val)
 {
-   for (int i=0; i<Size; i++)
-	   pVector[i]+=val;
-	return *this;
+   TVector<ValType> temp(*this);
+	for (int i=0; i<Size; i++)
+	   temp.pVector[i]+=val;
+	return temp;
 } /*-------------------------------------------------------------------------*/
 
 template <class ValType> // вычесть скаляр
 TVector<ValType> TVector<ValType>::operator-(const ValType &val)
 {
+	TVector<ValType> temp(*this);
      for (int i=0; i<Size; i++)
-	   pVector[i]-=val;
-	return *this;
+	   temp.pVector[i]-=val;
+	return temp;
 } /*-------------------------------------------------------------------------*/
 
 template <class ValType> // умножить на скаляр
 TVector<ValType> TVector<ValType>::operator*(const ValType &val)
 {
+	TVector<ValType> temp(*this);
      for (int i=0; i<Size; i++)
-	   pVector[i]*=val;
-	return *this;
+	   temp.pVector[i]*=val;
+	return temp;
 } /*-------------------------------------------------------------------------*/
 
 template <class ValType> // сложение
 TVector<ValType> TVector<ValType>::operator+(const TVector<ValType> &v)
 {
+	TVector temp(Size, StartIndex);
 	if ((Size!=v.Size)||(StartIndex!=v.StartIndex)) throw logic_error ("It is impossible to add vectors");
-	else {
-		TVector temp(Size, StartIndex);
+	else 
 		for (int i=0; i<Size; i++)
 			temp.pVector[i]=pVector[i]+v.pVector[i];
 	return temp;
-	}
 } /*-------------------------------------------------------------------------*/
 
 template <class ValType> // вычитание
 TVector<ValType> TVector<ValType>::operator-(const TVector<ValType> &v)
 {
+	TVector temp(Size, StartIndex);
     if ((Size!=v.Size)||(StartIndex!=v.StartIndex)) throw logic_error ("It is impossible to subtract vectors");
-	else {
-		TVector temp(Size, StartIndex);
+	else
 		for (int i=0; i<Size; i++)
 			temp.pVector[i]=pVector[i]-v.pVector[i];
 	return temp;
-	}
 } /*-------------------------------------------------------------------------*/
 
 template <class ValType> // скалярное произведение
 ValType TVector<ValType>::operator*(const TVector<ValType> &v)
 {
+   ValType res=0;
    if ((Size!=v.Size)||(StartIndex!=v.StartIndex)) throw logic_error ("It is impossible to multiply vectors scalar");
 	else
-	{
-		ValType res=0;
 		for (int i=0; i<Size; i++)
 			res+=pVector[i]*v.pVector[i];
 	return res;
-    }
 } /*-------------------------------------------------------------------------*/
 
 

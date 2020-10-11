@@ -101,7 +101,7 @@ TEST(TMatrix, compare_equal_matrices_return_true)
 TEST(TMatrix, compare_matrix_with_itself_return_true)
 {
 	TMatrix <int> m1(3);
-    EXPECT_EQ(true, m1==m1);
+    EXPECT_TRUE(m1==m1);
 }
 
 TEST(TMatrix, matrices_with_different_size_are_not_equal)
