@@ -228,7 +228,7 @@ TEST(TVector, cant_subtract_vectors_with_not_equal_size)
 TEST(TVector, can_multiply_vectors_with_equal_size)
 {
     TVector<int> v(10), v1(10);
-    TVector<int> exp = 30;
+    int exp = 30;
     for (int i = 0; i < v.GetSize(); i++)
         v[i] = 1;
     for (int i = 0; i < v1.GetSize(); i++)
