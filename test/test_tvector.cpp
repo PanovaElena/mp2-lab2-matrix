@@ -128,6 +128,8 @@ TEST(TVector, can_assign_vectors_of_different_size)
 TEST(TVector, compare_equal_vectors_return_true)
 {
     TVector<int> v(10);
+    for (int i = 0; i < v.GetSize(); i++)
+        v[i] = i + 4;
     TVector<int> v1(v);
     EXPECT_EQ(v, v1);
 }
