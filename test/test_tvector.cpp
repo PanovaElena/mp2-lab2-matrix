@@ -41,16 +41,16 @@ TEST(TVector, can_create_copied_vector)//+
 
 TEST(TVector, copied_vector_is_equal_to_source_one)//+?
 {
-    TVector<int> v_1(4);
-    TVector<int> v_2(v_1);
-    EXPECT_EQ(v_1, v_2);
+    TVector<int> v1(4);
+    TVector<int> v2(v1);
+    EXPECT_EQ(v1, v2);
 }
 
 TEST(TVector, copied_vector_has_its_own_memory)//+
 {
-    TVector<int> v_1;
-    TVector<int> v_2;
-    EXPECT_NE(&v_2, &v_1);
+    TVector<int> v1;
+    TVector<int> v2;
+    EXPECT_NE(&v2, &v1);
 }
 
 TEST(TVector, can_get_size)//+
@@ -89,19 +89,21 @@ TEST(TVector, throws_when_set_element_with_too_large_index)//+
 
 TEST(TVector, can_assign_vector_to_itself)//+
 {
-    TVector<int> v_1(3);
-    v_1 = v_1;
-    EXPECT_EQ(v_1,v_1);
+    TVector<int> v1(3);
+    v1 = v1;
+    EXPECT_EQ(v1,v1);
+    ASSERT_NO_THROW(v1=v1);
 }
 
 TEST(TVector, can_assign_vectors_of_equal_size)//+
 {
     const int size = 3;
-    TVector<int> v_1(size), v_2(size);
+    TVector<int> v1(size), v2(size);
     for (size_t i = 0; i < size; i++)
-        v_1[i] = i;
-    v_2 = v_1;
-    EXPECT_EQ(v_2, v_1);
+        v1[i] = i;
+    v2 = v1;
+    EXPECT_EQ(v2, v1);
+    ASSERT_NO_THROW(v2 = v1);
 }
 
 TEST(TVector, assign_operator_change_vector_size)//+

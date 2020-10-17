@@ -220,7 +220,7 @@ public:
 template <class ValType>
 TMatrix<ValType>::TMatrix(int s): TVector<TVector<ValType> >(s)
 {
-    if (s > -1 & s < MAX_MATRIX_SIZE) {
+    if ((s > -1) && (s < MAX_MATRIX_SIZE)) {
         for (size_t i = 0; i < s; i++)
             this->pVector[i] = TVector<ValType>(s - i, i);
     }
@@ -247,20 +247,21 @@ bool TMatrix<ValType>::operator==(const TMatrix<ValType> &mt) const
 template <class ValType> // сравнение
 bool TMatrix<ValType>::operator!=(const TMatrix<ValType> &mt) const
 {
-    return !(this == mt);
+    return !(*this == mt);
 } /*-------------------------------------------------------------------------*/
 
 template <class ValType> // присваивание
 TMatrix<ValType>& TMatrix<ValType>::operator=(const TMatrix<ValType> &mt)
 {
-    if (this != &mt) {
-        if (Size != mt.Size) {
-            delete[]pVector;
-            pVector = new TVector<ValType>[mt.Size];
+    if (*this != mt) {
+        if (GetSize() != mt.Size) {
+            delete[] pVector;
+            this->pVector = new TVector<ValType>[mt.Size];
         }
         Size = mt.Size;
         StartIndex = mt.StartIndex;
-        for (size_t i = 0; i < Size; i++) pVector[i] = mt.pVector[i];
+        for (size_t i = 0; i < GetSize(); i++) 
+            this->pVector[i] = mt.pVector[i];
     }
     return *this;
 } /*-------------------------------------------------------------------------*/
