@@ -64,9 +64,9 @@ template <class ValType>
 TVector<ValType>::TVector(int s, int si)
 {
 	if ((s <= MAX_VECTOR_SIZE && s > -1) && (si > -1 && si < MAX_VECTOR_SIZE)) {
-		pVector = new ValType[s];
-		Size = s;
-		StartIndex = si;
+		this->pVector = new ValType[s];
+		this->Size = s;
+		this->StartIndex = si;
 	}
 	else throw "incorrect size";
 } /*-------------------------------------------------------------------------*/
@@ -74,10 +74,11 @@ TVector<ValType>::TVector(int s, int si)
 template <class ValType> //конструктор копирования
 TVector<ValType>::TVector(const TVector<ValType>& v)
 {
-	pVector = new ValType[v.Size];
-	Size = v.Size;
-	StartIndex = v.StartIndex;
-	for (size_t i = 0; i < Size; i++) this->pVector[i] = v.pVector[i];
+	this->pVector = new ValType[v.Size];
+	this->Size = v.Size;
+	this->StartIndex = v.StartIndex;
+	for (size_t i = 0; i < this->Size; i++) 
+		this->pVector[i] = v.pVector[i];
 } /*-------------------------------------------------------------------------*/
 
 template <class ValType>
