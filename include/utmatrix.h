@@ -90,8 +90,8 @@ TVector<ValType>::~TVector()
 template <class ValType> // доступ
 ValType& TVector<ValType>::operator[](int pos)
 {
-	if (pos > -1 && pos < Size)
-		return pVector[pos];
+	if (pos > -1 && pos < this->Size)
+		return this->pVector[pos];
 	else throw "incorrect index";
 } /*-------------------------------------------------------------------------*/
 
@@ -134,7 +134,7 @@ TVector<ValType>& TVector<ValType>::operator=(const TVector& v)
 template <class ValType> // прибавить скаляр
 TVector<ValType> TVector<ValType>::operator+(const ValType& val)
 {
-	TVector<ValType> temp(GetSize());
+	TVector<ValType> temp(this->Size);
 	for (size_t i = 0; i < this->Size; i++)
 		temp[i] = this->pVector[i] + val;
 	return temp;
@@ -143,9 +143,9 @@ TVector<ValType> TVector<ValType>::operator+(const ValType& val)
 template <class ValType> // вычесть скаляр
 TVector<ValType> TVector<ValType>::operator-(const ValType& val)
 {
-	TVector<ValType> temp(GetSize());
+	TVector<ValType> temp(this->Size);
 	for (size_t i = 0; i < this->Size; i++)
-		temp[i] = pVector[i] - val;
+		temp[i] = this->pVector[i] - val;
 	return temp;
 } /*-------------------------------------------------------------------------*/
 
