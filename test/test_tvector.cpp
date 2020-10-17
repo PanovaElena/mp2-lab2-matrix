@@ -41,7 +41,11 @@ TEST(TVector, can_create_copied_vector)//+
 
 TEST(TVector, copied_vector_is_equal_to_source_one)//+?
 {
-    TVector<int> v1(4);
+    const int size = 4;
+    TVector<int> v1(size);
+    for (size_t i=0; i < size; i++) {
+        v1[i] = i;
+    }
     TVector<int> v2(v1);
     EXPECT_EQ(v1, v2);
 }
