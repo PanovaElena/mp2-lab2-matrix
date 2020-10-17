@@ -66,7 +66,6 @@ TEST(TMatrix, throws_when_set_element_with_too_large_index)
 {
     ASSERT_ANY_THROW(TMatrix<int> m(MAX_MATRIX_SIZE+1));
     //ASSERT_ANY_THROW(m[MAX_MATRIX_SIZE + 1]);
- 
 }
 
 TEST(TMatrix, can_assign_matrix_to_itself)

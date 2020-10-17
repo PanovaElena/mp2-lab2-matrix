@@ -110,7 +110,7 @@ TEST(TVector, assign_operator_change_vector_size)//+
 {
     const int size1 = 2, size2 = 5;
     TVector<int> v1(size1), v2(size2);
-    for (int i = 0; i < size1; i++)
+    for (size_t i = 0; i < size1; i++)
         v1[i] = i;
     v2 = v1;
 
@@ -121,7 +121,7 @@ TEST(TVector, can_assign_vectors_of_different_size)//+
 {
     const int size1 = 2, size2 = 5;
     TVector<int> v1(size1), v2(size2);
-    for (int i = 0; i < size1; i++)
+    for (size_t i = 0; i < size1; i++)
         v1[i] = i;
     v2 = v1;
 
