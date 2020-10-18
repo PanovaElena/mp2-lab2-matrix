@@ -41,7 +41,9 @@ TEST(TVector, can_create_copied_vector)
 
 TEST(TVector, copied_vector_is_equal_to_source_one)
 {
-    TVector<int> v1;
+    TVector<int> v1(5);
+    for (int i = 0; i < 5; i++)
+        v1[i] = i;
     TVector<int> v2(v1);
 
     EXPECT_EQ(v1, v2);
@@ -127,8 +129,10 @@ TEST(TVector, can_assign_vectors_of_different_size)
 
 TEST(TVector, compare_equal_vectors_return_true)
 {
-    TVector<int> v1;
-    TVector<int> v2;
+    TVector<int> v1(5);
+    for (int i = 0; i < 5; i++)
+        v1[i] = i;
+    TVector<int> v2(v1);
 
     EXPECT_EQ(v1 == v2, true);
 }

@@ -106,9 +106,9 @@ TEST(TMatrix, can_assign_matrices_of_different_size)
 TEST(TMatrix, compare_equal_matrices_return_true)
 {
     TMatrix<int> m1;
-    TMatrix<int> m2;
+    TMatrix<int> m2(m1);
 
-    EXPECT_EQ(m1 == m2, true);
+    EXPECT_EQ(m1, m2);
 }
 
 TEST(TMatrix, compare_matrix_with_itself_return_true)
