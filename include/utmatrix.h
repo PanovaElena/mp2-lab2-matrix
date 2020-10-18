@@ -78,7 +78,7 @@ TVector<ValType>::TVector(const TVector<ValType>& v)
     this->Size = v.Size;
     this->StartIndex = v.StartIndex;
     this->pVector = new ValType[Size];
-    for (int i = 0; i < Size; i++)
+    for (int i = 0; i < this->Size; i++)
     {
         this->pVector[i] = v.pVector[i];
     }
@@ -107,7 +107,7 @@ bool TVector<ValType>::operator==(const TVector& v) const
 {
     if ((this->Size != v.Size) || (this->StartIndex != v.StartIndex))
         return false;
-    for (int i = 0; i < Size; i++)
+    for (int i = 0; i < this->Size; i++)
         if (this->pVector[i] != v.pVector[i])
             return false;
     return true;
@@ -130,7 +130,7 @@ TVector<ValType>& TVector<ValType>::operator=(const TVector& v)
             delete[] this->pVector;
         this->Size = v.Size;
         this->StartIndex = v.StartIndex;
-        this->pVector = new ValType[Size];
+        this->pVector = new ValType[this->Size];
         for (int i = 0; i < this->Size; i++)
             this->pVector[i] = v.pVector[i];
     }
