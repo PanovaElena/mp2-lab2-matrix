@@ -231,7 +231,7 @@ TMatrix<ValType>::TMatrix(int s) : TVector<TVector<ValType> >(s)
         throw "Negative or Too Big Length";
 
     for (int i = 0; i < s; i++)
-        pVector[i] = TVector<ValType>(s - i, i);
+        (*this).pVector[i] = TVector<ValType>(s - i, i);
 
     // по умолчанию создается квадратная матрица sхs
     // надо заменить созданную матрицу верхнетреугольной
@@ -244,11 +244,11 @@ TMatrix<ValType>::TMatrix(const TMatrix<ValType>& mt) :
 {
     if ((*this).Size < mt.Size) {
         for (int i = (*this).Size + 1; i < mt.Size; i++)
-            pVector[i] = mt.pVector[i];
+            (*this).pVector[i] = mt.pVector[i];
         (*this).Size = mt.Size;
     }
     for (int i = 0; i < (*this).Size; i++)
-        pVector[i] = mt.pVector[i];
+        (*this).pVector[i] = mt.pVector[i];
 }
 
 template <class ValType> // конструктор преобразования типа
@@ -294,12 +294,12 @@ TMatrix<ValType>& TMatrix<ValType>::operator=(const TMatrix<ValType>& mt)
         pVector[i] = mt.pVector[i];
     return *this;*/
     if (this != &mt) {
-        if (Size != mt.Size) {
-            delete[] pVector;
-            pVector = new TVector<ValType>[mt.Size];
+        if ((*this).Size != mt.Size) {
+            delete[](*this).pVector;
+            (*this).pVector = new TVector<ValType>[mt.Size];
         }
         Size = mt.Size; StartIndex = mt.StartIndex;
-        for (int i = 0; i < Size; i++) pVector[i] = mt.pVector[i];
+        for (int i = 0; i < (*this).Size; i++) pVector[i] = mt.pVector[i];
     }
     return *this;
 } /*-------------------------------------------------------------------------*/
