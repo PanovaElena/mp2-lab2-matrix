@@ -308,11 +308,11 @@ TMatrix<ValType>& TMatrix<ValType>::operator=(const TMatrix<ValType>& mt)
 template <class ValType> // сложение
 TMatrix<ValType> TMatrix<ValType>::operator+(const TMatrix<ValType>& mt)
 {
-    if (Size != mt.Size)
+    if (this->Size != mt.Size)
         throw "Unequal sizes";
     TMatrix temp(mt.Size);
     for (int i = 0; i < mt.Size; i++)
-        temp.pVector[i] = pVector[i] + mt.pVector[i];
+        temp.pVector[i] = this->pVector[i] + mt.pVector[i];
     return temp;
         
     //return TVector<TVector<ValType> >::operator+(mt);
@@ -324,11 +324,11 @@ TMatrix<ValType> TMatrix<ValType>::operator+(const TMatrix<ValType>& mt)
 template <class ValType> // вычитание
 TMatrix<ValType> TMatrix<ValType>::operator-(const TMatrix<ValType>& mt)
 {
-   if (Size != mt.Size)
+   if (this->Size != mt.Size)
         throw "Unequal sizes";
     TMatrix temp(mt.Size);
     for (int i = 0; i < mt.Size; i++)
-        temp.pVector[i] = pVector[i] - mt.pVector[i];
+        temp.pVector[i] = this->pVector[i] - mt.pVector[i];
     return temp;
 
     //return TVector<TVector<ValType> >::operator-(mt);
