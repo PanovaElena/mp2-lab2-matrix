@@ -78,7 +78,7 @@ TVector<ValType>::TVector(const TVector<ValType> &v)
     Size = v.Size;
     StartIndex = v.StartIndex;
     pVector = new ValType[v.Size];
-    if (pVector != nullptr)
+    if (pVector != NULL)
         for (int i = 0; i < v.Size; i++)
             pVector[i] = v.pVector[i];
 } 
@@ -89,7 +89,7 @@ TVector<ValType>::~TVector()
     if (pVector)  //проверка на то, что указатель пришёл ненулевой. Если нулевой, то удаляли ранее, то удалять второй раз содержимое памяти нельзя
     {
         delete[] pVector;
-        pVector = nullptr;
+        pVector = NULL;
     }
 } 
 
@@ -130,7 +130,7 @@ TVector<ValType>& TVector<ValType>::operator=(const TVector &v)
     {
         if (this->Size != v.Size)
         {
-            if (pVector!=nullptr) delete[] pVector;
+            if (pVector!=NULL) delete[] pVector;
             this->pVector = new ValType[v.Size];
         }
         for (int i = 0; i < v.Size; i++)
