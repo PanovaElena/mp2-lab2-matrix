@@ -247,7 +247,7 @@ TMatrix<ValType>::TMatrix(const TMatrix<ValType>& mt) :
             (*this).pVector[i] = mt.pVector[i];
         (*this).Size = mt.Size;
     }
-    for (int i = 0; i < (*this).Size; i++)
+    for (int i = 0; i < (*this).GetSize(); i++)
         (*this).pVector[i] = mt.pVector[i];
 }
 
@@ -298,7 +298,7 @@ TMatrix<ValType>& TMatrix<ValType>::operator=(const TMatrix<ValType>& mt)
             delete[](*this).pVector;
             (*this).pVector = new TVector<ValType>[mt.Size];
         }
-        Size = mt.Size; StartIndex = mt.StartIndex;
+        (*this).Size = mt.Size; (*this).StartIndex = mt.StartIndex;
         for (int i = 0; i < (*this).Size; i++) pVector[i] = mt.pVector[i];
     }
     return *this;
