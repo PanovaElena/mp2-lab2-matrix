@@ -135,6 +135,9 @@ TEST(TMatrix, can_subtract_matrices_with_equal_size)
 {
 	TMatrix <int> a(5);
 	TMatrix <int> b(5);
+	//TMatrix <int> c(5);
+	//c = a - b;
+	//EXPECT_EQ(0, c[0][0]);
 	ASSERT_NO_THROW(a - b);
 }
 

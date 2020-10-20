@@ -172,8 +172,9 @@ TEST(TVector, can_add_vectors_with_equal_size)
 {
     TVector<int> v1(4);
     TVector<int> v2(4);
-    v1 + v2;
-    EXPECT_EQ(2, v1[0]);
+    TVector<int> v3(4);
+    v3 = v1 + v2;
+    EXPECT_EQ(2, v3[0]);
 }
 
 TEST(TVector, cant_add_vectors_with_not_equal_size)
