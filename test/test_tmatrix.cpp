@@ -52,7 +52,8 @@ TEST(TMatrix, can_get_size)
 TEST(TMatrix, can_set_and_get_element)
 {
 	TMatrix<int> m(5);
-	ASSERT_NO_THROW(m.GetSize(), m[2] = 2);
+	ASSERT_NO_THROW(m.GetSize());
+	ASSERT_NO_THROW(m[2] = 2);
 }
 
 TEST(TMatrix, throws_when_set_element_with_negative_index)
@@ -65,7 +66,6 @@ TEST(TMatrix, throws_when_set_element_with_too_large_index)
 {
 	TMatrix <int> a(5);
 	ASSERT_ANY_THROW(a[6][3] = 1);
-	//ADD_FAILURE();
 }
 
 TEST(TMatrix, can_assign_matrix_to_itself)
