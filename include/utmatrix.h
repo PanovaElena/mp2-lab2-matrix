@@ -97,7 +97,7 @@ template <class ValType> // доступ
 ValType& TVector<ValType>::operator[](int pos)
 {
     if (pos<Size+StartIndex && pos>=StartIndex)
-        return pVector[pos];
+        return pVector[pos-StartIndex];
     else throw "Incorrect position number";
 }
 
