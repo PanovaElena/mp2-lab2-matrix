@@ -358,7 +358,7 @@ public:
             }
         }
 
-        return res;
+        return tmp;
     }
 
     size_t size() const noexcept { return sz; }
