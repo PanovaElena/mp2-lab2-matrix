@@ -63,29 +63,15 @@ public:
 
     TDynamicVector(TDynamicVector&& v) noexcept
     {
-        sz = v.sz;
-        if (pMem = nullptr)
-        {
-            pMem = new T[sz]();
-        }
-        else
-        {
-            delete[]pMem;
-            pMem = new T[sz]();
-        }
-        for (int i = 0; i < sz; i++)
-        {
-            pMem[i] = v.pMem[i];
-        }
-
-        v.pMem = nullptr;
-        v.sz = 0;
+        pMem = nullptr;
+        swap(*this, v);
     }
 
     ~TDynamicVector()
     {
         delete[]pMem;
         pMem = nullptr;
+        sz = 0;
     }
 
     TDynamicVector& operator=(const TDynamicVector& v)
@@ -238,12 +224,12 @@ public:
         {
             throw "Can't do addition, Sizes should be equal";
         }
-        TDynamicVector res(*this);
+        TDynamicVector tmp(*this);
         for (int i = 0; i < sz; i++)
         {
-            res.pMem[i] += v.pMem[i];
+            tmp.pMem[i] += v.pMem[i];
         }
-        return res;
+        return tmp;
     }
 
     TDynamicVector operator-(const TDynamicVector& v)
@@ -266,12 +252,12 @@ public:
         {
             throw "Can't do '*', Sizes should be equal";
         }
-        T res = 0;
+        T tmp = 0;
         for (int i = 0; i < sz; i++)
         {
-            res += pMem[i] * v.pMem[i];
+            tmp += pMem[i] * v.pMem[i];
         }
-        return res;
+        return tmp;
     }
 
     friend void swap(TDynamicVector& lhs, TDynamicVector& rhs) noexcept
@@ -347,12 +333,12 @@ public:
     // матрично-скалярные операции
     TDynamicMatrix operator*(const T& val)
     {
-        TDynamicMatrix res(*this);
+        TDynamicMatrix tmp(*this);
         for (int i = 0; i < sz; i++)
         {
-            res[i] = res[i] * val;
+            tmp[i] = tmp[i] * val;
         }
-        return res;
+        return tmp;
     }
 
     // матрично-векторные операции
@@ -362,13 +348,13 @@ public:
         {
             throw "Can't do matrix-vector '*', Sizes should be match";
         }
-        TDynamicVector<T> res(v.sz);
+        TDynamicVector<T> tmp(v.sz);
         for (int i = 0; i < sz; i++)
         {
-            res[i] = 0;
+            tmp[i] = 0;
             for (int j = 0; j < sz; j++)
             {
-                res[i] += pMem[i][j] * v[j];
+                tmp[i] += pMem[i][j] * v[j];
             }
         }
 
@@ -384,12 +370,12 @@ public:
         {
             throw "Can't do matrix '+', Sizes should be equal";
         }
-        TDynamicMatrix res(*this);
+        TDynamicMatrix tmp(sz);
         for (int i = 0; i < sz; i++)
         {
-            res.pMem[i] = pMem[i] + m.pMem[i];
+            tmp.pMem[i] = pMem[i] + m.pMem[i];
         }
-        return res;
+        return tmp;
     }
     TDynamicMatrix operator-(const TDynamicMatrix& m)
     {
@@ -397,12 +383,12 @@ public:
         {
             throw "Can't do matrix '-', Sizes should be equal";
         }
-        TDynamicMatrix res(*this);
+        TDynamicMatrix tmp(sz);
         for (int i = 0; i < sz; i++)
         {
-            res.pMem[i] = pMem[i] - m.pMem[i];
+            tmp.pMem[i] = pMem[i] - m.pMem[i];
         }
-        return res;
+        return tmp;
     }
     TDynamicMatrix operator*(const TDynamicMatrix& m)
     {
@@ -410,16 +396,16 @@ public:
         {
             throw "Can't do matrix '*', Sizes should be match";
         }
-        TDynamicMatrix<T> res(m.sz);
+        TDynamicMatrix<T> tmp(m.sz);
         for (int i = 0; i < sz; ++i) {
             for (int k = 0; k < sz; ++k) {
                 for (int j = 0; j < sz; ++j) {
-                    res.pMem[i][j] += pMem[i][k] * pMem[k][j];
+                    tmp.pMem[i][j] += pMem[i][k] * pMem[k][j];
                 }
             }
         }
 
-        return res;
+        return tmp;
     }
 
     // ввод/вывод
@@ -430,7 +416,7 @@ public:
             cin >> v.pMem[i];
         }
 
-        return istr
+        return istr;
     }
     friend ostream& operator<<(ostream& ostr, const TDynamicMatrix& v)
     {
