@@ -13,6 +13,8 @@ using namespace std;
 
 const int MAX_VECTOR_SIZE = 100000000;
 const int MAX_MATRIX_SIZE = 10000;
+const int FLOAT_EPSILON = 1e-6;
+const int DOUBLE_EPSILON = 1e-14;
 
 // Динамический вектор - 
 // шаблонный вектор на динамической памяти
@@ -20,8 +22,8 @@ template<typename T>
 class TDynamicVector
 {
 protected:
-  size_t sz;
-  T* pMem;
+  size_t sz = 0;
+  T* pMem = nullptr;
 public:
   TDynamicVector(size_t s = 1) : sz(s)
   {
@@ -111,9 +113,18 @@ public:
   bool operator==(const TDynamicVector& v) const noexcept
   {
       if (sz != v.sz) return false;
+      T epsilon = static_cast<T>(0);
+      if (std::is_same<T, float>::value)
+      {
+          epsilon = static_cast<T>(FLOAT_EPSILON);
+      }
+      if (std::is_same<T, double>::value)
+      {
+          epsilon = static_cast<T>(DOUBLE_EPSILON);
+      }
       for (size_t i = 0; i < sz; i++)
       {
-          if (pMem[i] != v.pMem[i]) return false;
+          if (std::abs(pMem[i] - v.pMem[i]) > epsilon) return false;
       }
       return true;
   }
@@ -132,7 +143,7 @@ public:
       }
       return res;
   }
-  TDynamicVector operator-(double val)
+  TDynamicVector operator-(T val)//Тут было double val. WHY???
   {
       TDynamicVector res(sz);
       for (size_t i = 0; i < sz; i++)
@@ -141,7 +152,7 @@ public:
       }
       return res;
   }
-  TDynamicVector operator*(double val)
+  TDynamicVector operator*(T val)//Тут было double val. WHY???
   {
       TDynamicVector res(sz);
       for (size_t i = 0; i < sz; i++)
@@ -174,16 +185,16 @@ public:
       }
       return res;
   }
-  T operator*(const TDynamicVector& v) noexcept(noexcept(T()))
+  T operator*(const TDynamicVector& v) //cant_multiply_vectors_with_not_equal_size, but it should be noexcept(noexcept(T()))???
   {
       if (sz != v.sz)
           throw invalid_argument("Vector sizes are not EQ");
-      TDynamicVector res(sz);
+      T result = T();
       for (size_t i = 0; i < sz; i++)
       {
-          res[i] = pMem[i] * v.pMem[i];
+          result += pMem[i] * v.pMem[i];  // Суммируем произведения
       }
-      return res;
+      return result;  // Возвращаем скаляр
   }
 
   friend void swap(TDynamicVector& lhs, TDynamicVector& rhs) noexcept
@@ -216,10 +227,14 @@ class TDynamicMatrix : private TDynamicVector<TDynamicVector<T>>
   using TDynamicVector<TDynamicVector<T>>::pMem;
   using TDynamicVector<TDynamicVector<T>>::sz;
 public:
-  TDynamicMatrix(size_t s = 1) : TDynamicVector<TDynamicVector<T>>(s)
+  TDynamicMatrix(size_t s = 1)
   {
+      if (s <= 0)
+          throw out_of_range("Matrix size should be greater than zero");
       if (s > MAX_MATRIX_SIZE)
           throw out_of_range("Matrix is too large");
+      this->sz = s;
+      this->pMem = new TDynamicVector<T>[s];
       for (size_t i = 0; i < sz; i++)
       {
           pMem[i] = TDynamicVector<T>(sz);
@@ -227,6 +242,7 @@ public:
   }
 
   using TDynamicVector<TDynamicVector<T>>::operator[];
+  size_t size() const noexcept { return sz; }//Как это можно было не добавить в .h файл?
 
   // сравнение
   bool operator==(const TDynamicMatrix& m) const noexcept
@@ -238,11 +254,15 @@ public:
       }
       return true;
   }
+  bool operator!=(const TDynamicMatrix& m) const noexcept
+  {
+      return !(*this == m);
+  }
 
   // матрично-скалярные операции
   TDynamicVector<T> operator*(const T& val)
   {
-      TDynamicMatrix res(sz);
+      TDynamicVector<T> res(sz);
       for (size_t i = 0; i < sz; i++)
       {
           res[i] = pMem[i] * val;
@@ -273,7 +293,7 @@ public:
       TDynamicMatrix res(sz);
       for (size_t i = 0; i < sz; i++)
       {
-          res[i] = pMem[i] + val;
+          res[i] = pMem[i] + m.pMem[i];
       }
       return res;
   }
@@ -282,21 +302,21 @@ public:
       TDynamicMatrix res(sz);
       for (size_t i = 0; i < sz; i++)
       {
-          res[i] = pMem[i] - val;
+          res[i] = pMem[i] - m.pMem[i];
       }
       return res;
   }
   TDynamicMatrix operator*(const TDynamicMatrix& m)
   {
-      if (sz != v.size())
+      if (sz != m.size())
           throw invalid_argument("Matrix1 and Matrix2 must be equal n1 and m2");
       TDynamicMatrix res(sz);
       for (size_t i = 0; i < sz; i++)
       {
-          for (size_t k = 0; k < sz; k++)
+          for (size_t j = 0; j < sz; j++)
           {
               res[i][j] = T();
-              for (size_t j = 0; j < sz; j++)
+              for (size_t k = 0; k < sz; k++)
               {
                   res[i][j] += pMem[i][k] * m.pMem[k][j];
               }
@@ -306,7 +326,7 @@ public:
   }
 
   // ввод/вывод
-  friend istream& operator>>(istream& istr, TDynamicMatrix& v)
+  friend istream& operator>>(istream& istr, TDynamicMatrix& m)
   {
       for (size_t i = 0; i < m.sz; i++)
       {
@@ -317,7 +337,7 @@ public:
       }
       return istr;
   }
-  friend ostream& operator<<(ostream& ostr, const TDynamicMatrix& v)
+  friend ostream& operator<<(ostream& ostr, const TDynamicMatrix& m)
   {
       for (size_t i = 0; i < m.sz; i++)
       {
