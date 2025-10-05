@@ -27,7 +27,7 @@ public:
   {
     if (sz == 0)
       throw out_of_range("Vector size should be greater than zero");
-    if (sz > MAX_VECTOR - SIZE) {
+    if (sz > MAX_VECTOR_SIZE) {
         throw "Error";
     }
     pMem = new T[sz]();// {}; // У типа T д.б. констуктор по умолчанию
@@ -57,7 +57,7 @@ public:
   }
   ~TDynamicVector()
   {
-      delete pMem[];
+      delete[] pMem;
       pMem = nullptr;
       sz = 0;
   }
@@ -90,14 +90,14 @@ public:
   // индексация
   T& operator[](size_t ind)
   {
-      if (ind < sz) {
+      if (ind>=0 && ind < sz) {
           return pMem[ind];
       }
       throw "Error: incorrect index";
   }
   const T& operator[](size_t ind) const
   {
-      if (ind < sz) {
+      if (ind >= 0 && ind < sz) {
           return pMem[ind];
       }
       throw "Error: incorrect index";
@@ -105,14 +105,14 @@ public:
   // индексация с контролем
   T& at(size_t ind)
   {
-      if (ind < sz) {
+      if (ind >= 0 && ind < sz) {
           return pMem[ind];
       }
       throw "Error: incorrect index";
   }
   const T& at(size_t ind) const
   {
-      if (ind < sz) {
+      if (ind >= 0 && ind < sz) {
           return pMem[ind];
       }
       throw "Error: incorrect index";
@@ -235,6 +235,7 @@ public:
   }
 
   using TDynamicVector<TDynamicVector<T>>::operator[];
+  using TDynamicVector<TDynamicVector<T>>::size;
 
   // сравнение
   bool operator==(const TDynamicMatrix& m) const noexcept
