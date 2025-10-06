@@ -253,3 +253,23 @@ TEST(TDynamicMatrix, cant_subtract_matrixes_with_not_equal_size)
 	ASSERT_ANY_THROW(v1 - v2);
 }
 
+TEST(TDynamicMatrix, io) {
+	TDynamicMatrix<int> v1(4);
+	for (size_t i = 0; i < v1.size(); i++) {
+		for (size_t j = 0; j < v1.size(); j++) {
+			v1[i][j] = i + j;
+		}
+	}
+	TDynamicMatrix<int> v2(4);
+	std::stringstream s;
+	s << v1;
+	s >> v2;
+	EXPECT_EQ(v1, v2);
+}
+
+TEST(TDynamicMatrix, multiply_matrix_const) {
+	TDynamicMatrix<int> m(2);
+	m[0][0] = 0; m[0][1] = 1; m[1][0] = 2; m[1][1] = 3;
+	m * 2;
+	TDynamicMatrix<int> x(m);
+}

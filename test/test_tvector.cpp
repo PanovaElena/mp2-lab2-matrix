@@ -271,3 +271,44 @@ TEST(TDynamicVector, cant_multiply_vectors_with_not_equal_size)
 	EXPECT_EQ(v1 * v2, 0);
 }
 
+TEST(TDynamicVector, MoveConstructor) {
+	TDynamicVector<int> v(3);
+	for (size_t i = 0; i < v.size(); i++) {
+		v[i] = i;
+	}
+	int* ptr = v.data();
+	TDynamicVector<int> copy(std::move(v));
+	for (size_t i = 0; i < copy.size(); i++) {
+		EXPECT_EQ(copy[i], i);
+	}
+	EXPECT_EQ(3, copy.size());
+	EXPECT_EQ(copy.data(), ptr);
+	EXPECT_EQ(v.size(),0);
+	EXPECT_EQ(v.data(),nullptr);
+}
+
+TEST(TDynamicVector,MoveAssignment) {
+	TDynamicVector<int> v(3);
+	for (size_t i = 0; i < v.size(); i++) {
+		v[i] = i;
+	}
+	TDynamicVector<int> copy(2);
+	copy = std::move(v);
+	for (size_t i = 0; i < copy.size(); i++) {
+		EXPECT_EQ(copy[i], i);
+	}
+	EXPECT_EQ(3, copy.size());
+	EXPECT_EQ(v.data(), nullptr);
+}
+
+TEST(TDynamicVector, io) {
+	TDynamicVector<int> v1(3);
+	TDynamicVector<int> v2(3);
+	for (size_t i = 0; i < v1.size(); i++) {
+		v1[i] = i;
+	}
+	std::stringstream s;
+	s << v1;
+	s >> v2;
+	EXPECT_EQ(v1, v2);
+}

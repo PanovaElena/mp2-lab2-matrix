@@ -87,6 +87,10 @@ public:
 
   size_t size() const noexcept { return sz; }
 
+  T* data() {
+      return pMem;
+  }
+
   // индексация
   T& operator[](size_t ind)
   {
@@ -234,6 +238,12 @@ public:
       pMem[i] = TDynamicVector<T>(sz);
   }
 
+  TDynamicMatrix(const TDynamicMatrix& m):TDynamicVector<TDynamicVector<T>>(m.sz) {
+      for (size_t i = 0; i < sz; i++) {
+          pMem[i] = m.pMem[i];
+      }
+  }
+
   using TDynamicVector<TDynamicVector<T>>::operator[];
   using TDynamicVector<TDynamicVector<T>>::size;
 
@@ -254,11 +264,13 @@ public:
   }
 
   // матрично-скалярные операции
-  TDynamicVector<T> operator*(const T& val)
+  TDynamicMatrix<T> operator*(const T& val)
   {
-      TDynamicVector result(sz);
-      for (size_t i = 0; i < sz; i++) {
-          result[i] = pMem[i] * val;
+      TDynamicMatrix<T> result(sz);
+      for (int i = 0; i < sz; i++) {
+          for (int j = 0; j < sz; j++) {
+              result[i][j] *= val;
+          }
       }
       return result;
   }
