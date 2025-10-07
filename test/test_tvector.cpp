@@ -223,3 +223,36 @@ TEST(TDynamicVector, cant_multiply_vectors_with_not_equal_size)
     ASSERT_ANY_THROW(TDynamicVector<int> v3 = v1 * v2);
 }
 
+TEST(TDynamicVector, can_move_construct_vector)
+{
+    TDynamicVector<int> v(3);
+    v[0] = 1; v[1] = 2; v[2] = 3;
+
+    TDynamicVector<int> v_moved(std::move(v));
+
+    EXPECT_EQ(v_moved.size(), 3);
+    EXPECT_EQ(v_moved[0], 1);
+    EXPECT_EQ(v_moved[1], 2);
+    EXPECT_EQ(v_moved[2], 3);
+
+    EXPECT_EQ(v.size(), 0);
+    EXPECT_EQ(v.data(), nullptr);
+}
+
+TEST(TDynamicVector, can_move_assign_vector)
+{
+    TDynamicVector<int> v1(3);
+    v1[0] = 1; v1[1] = 2; v1[2] = 3;
+
+    TDynamicVector<int> v2(5);
+    v2 = std::move(v1);
+
+    EXPECT_EQ(v2.size(), 3);
+    EXPECT_EQ(v2[0], 1);
+    EXPECT_EQ(v2[1], 2);
+    EXPECT_EQ(v2[2], 3);
+
+    EXPECT_EQ(v1.size(), 0);
+    EXPECT_EQ(v1.data(), nullptr);
+}
+
