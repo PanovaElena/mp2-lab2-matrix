@@ -270,6 +270,35 @@ TEST(TDynamicMatrix, io) {
 TEST(TDynamicMatrix, multiply_matrix_const) {
 	TDynamicMatrix<int> m(2);
 	m[0][0] = 0; m[0][1] = 1; m[1][0] = 2; m[1][1] = 3;
-	m * 2;
-	TDynamicMatrix<int> x(m);
+	TDynamicMatrix<int> x(2);
+	x = m * 2;
+	EXPECT_EQ(0, x[0][0]);
+	EXPECT_EQ(2, x[0][1]);
+	EXPECT_EQ(4, x[1][0]);
+	EXPECT_EQ(6, x[1][1]);
+}
+
+TEST(TDynamicMatrix, multiply_matrix_vector) {
+	TDynamicMatrix<int> m(2);
+	m[0][0] = 0; m[0][1] = 1; m[1][0] = 2; m[1][1] = 3;
+	TDynamicVector<int> v(2);
+	v[0] = 2; v[1] = 2;
+	TDynamicVector<int> x(2);
+	x = m * v;
+	EXPECT_EQ(x[0],2);
+	EXPECT_EQ(x[1], 10);
+}
+
+TEST(TDynamicMatrix, multiply_matrix_matrix) {
+	TDynamicMatrix<int> m1(2);
+	m1[0][0] = 0; m1[0][1] = 1; m1[1][0] = 2; m1[1][1] = 3;
+	TDynamicMatrix<int> m2(2);
+	m2[0][0] = 0; m2[0][1] = 1; m2[1][0] = 2; m2[1][1] = 3;
+	TDynamicMatrix<int> x(2);
+	x = m1 * m2;
+	EXPECT_EQ(2, x[0][0]);
+	EXPECT_EQ(3, x[0][1]);
+	EXPECT_EQ(6, x[1][0]);
+	EXPECT_EQ(11, x[1][1]);
+
 }
