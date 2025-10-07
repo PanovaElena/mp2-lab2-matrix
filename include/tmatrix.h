@@ -35,7 +35,7 @@ public:
   TDynamicVector(T* arr, size_t s) : sz(s)
   {
     assert(arr != nullptr && "TDynamicVector ctor requires non-nullptr arg");
-    if (sz > MAX_VECTOR - SIZE) {
+    if (sz > MAX_VECTOR_SIZE) {
         throw "Error";
     }
     pMem = new T[sz];
