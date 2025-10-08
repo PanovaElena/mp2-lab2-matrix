@@ -8,12 +8,11 @@
 #include "tmatrix.h"
 //---------------------------------------------------------------------------
 
-void main()
+int main()
 {
   TDynamicMatrix<int> a(5), b(5), c(5);
   int i, j;
 
-  setlocale(LC_ALL, "Russian");
   cout << "Тестирование класс работы с матрицами"
     << endl;
   for (i = 0; i < 5; i++)
