@@ -8,6 +8,7 @@
 #define __TDynamicMatrix_H__
 
 #include <iostream>
+#include <stdexcept>
 
 using namespace std;
 
@@ -27,23 +28,23 @@ public:
   {
     if (sz == 0)
       throw out_of_range("Vector size should be greater than zero");
-    if(sz > MAX_VECTOR_SIZE) throw "Error";
+    if(sz > MAX_VECTOR_SIZE) throw out_of_range("Error");
 
     pMem = new T[sz]();// {}; // У типа T д.б. констуктор по умолчанию
   }
   TDynamicVector(T* arr, size_t s) : sz(s)
   {
     assert(arr != nullptr && "TDynamicVector ctor requires non-nullptr arg");
-    if(sz > MAX_VECTOR_SIZE) throw "Error";
+    if(sz > MAX_VECTOR_SIZE) throw out_of_range("Error");
     pMem = new T[sz];
     std::copy(arr, arr + sz, pMem);
   }
-  TDynamicVector(const TDynamicVector& v) : : sz(v.sz)
+  TDynamicVector(const TDynamicVector& v) : sz(v.sz)
   {
     pMem = new T[sz];
     std::copy(v.pMem,v.pMem + sz, pMem);
   }
-  TDynamicVector(TDynamicVector&& v) noexcept : : sz(v.sz), pMem(v.pMem)
+  TDynamicVector(TDynamicVector&& v) noexcept : sz(v.sz), pMem(v.pMem)
   {
     v.sz = 0;
     v.pMem = nullptr;
@@ -91,12 +92,12 @@ public:
   T& at(size_t ind)
   {
     if(ind >= 0 && ind < sz) return pMem[ind];
-    else throw "Error";
+    else throw out_of_range("Error");
   }
   const T& at(size_t ind) const
   {
     if(ind >= 0 && ind < sz) return pMem[ind];
-    else throw "Error";
+    else throw out_of_range("Error");
   }
 
   // сравнение
@@ -135,7 +136,7 @@ public:
   // векторные операции
   TDynamicVector operator+(const TDynamicVector& v)
   {
-    if(sz != v.sz) throw "Error";
+    if(sz != v.sz) throw invalid_argument("Error");
 
     TDynamicVector res(sz);
     for(size_t i = 0; i < sz; i++)
@@ -145,7 +146,7 @@ public:
   }
   TDynamicVector operator-(const TDynamicVector& v)
   {
-    if(sz != v.sz) throw "Error";
+    if(sz != v.sz) throw invalid_argument("Error");
 
      TDynamicVector res(sz);
     for (size_t i = 0; i < sz; i++)
@@ -155,7 +156,7 @@ public:
   }
   T operator*(const TDynamicVector& v) noexcept(noexcept(T()))
   {
-    if(sz != v.sz) throw "Error";
+    if(sz != v.sz) throw invalid_argument("Error");
 
     T res = T();
     for (size_t i = 0; i < sz; i++)
@@ -196,7 +197,7 @@ class TDynamicMatrix : private TDynamicVector<TDynamicVector<T>>
 public:
   TDynamicMatrix(size_t s = 1) : TDynamicVector<TDynamicVector<T>>(s)
   {
-    if(s > MAX_MATRIX_SIZE) throw "Error";
+    if(s > MAX_MATRIX_SIZE) throw out_of_range("Error");
 
     for (size_t i = 0; i < sz; i++)
       pMem[i] = TDynamicVector<T>(sz);
@@ -222,20 +223,20 @@ public:
   }
 
   // матрично-скалярные операции
-  TDynamicVector<T> operator*(const T& val)
-  {
-    TDynamicMatrix res(sz);
-    for (size_t i = 0; i < sz; i++)
-      res[i] = pMem[i] * val;
-    return res;
-  }
+  TDynamicMatrix operator*(const T& val) 
+    {
+        TDynamicMatrix res(sz);
+        for (size_t i = 0; i < sz; i++)
+            res[i] = pMem[i] * val;
+        return res;
+    }
 
   //operator+ and operator- not needed?
 
   // матрично-векторные операции
   TDynamicVector<T> operator*(const TDynamicVector<T>& v)
   {
-    if(sz != v.size()) throw "Error";
+    if(sz != v.size()) throw invalid_argument("Error");
 
     TDynamicVector<T> res(sz);
     for (size_t i = 0; i < sz; i++)
@@ -246,7 +247,7 @@ public:
   // матрично-матричные операции
   TDynamicMatrix operator+(const TDynamicMatrix& m)
   {
-    if (sz != m.sz) throw "Error";
+    if (sz != m.sz) throw invalid_argument("Error");
     
     TDynamicMatrix res(sz);
     for (size_t i = 0; i < sz; i++)
@@ -255,7 +256,7 @@ public:
   }
   TDynamicMatrix operator-(const TDynamicMatrix& m)
   {
-    if (sz != m.sz) throw "Error";
+    if (sz != m.sz) throw invalid_argument("Error");
     
     TDynamicMatrix res(sz);
     for (size_t i = 0; i < sz; i++)
@@ -264,15 +265,15 @@ public:
   }
   TDynamicMatrix operator*(const TDynamicMatrix& m)
   {
-     if (sz != m.size()) throw "Error";
+     if (sz != m.size()) throw invalid_argument("Error");
     
     TDynamicMatrix res(sz);
     
-    for (size_t row = 0; row < sz; row++) {           // Для каждой строки левой матрицы
-        for (size_t col = 0; col < sz; col++) {       // Для каждого столбца правой матрицы
-            T skal = T();                       // Скалярное произведение
+    for (size_t row = 0; row < sz; row++) {          
+        for (size_t col = 0; col < sz; col++) {      
+            T skal = T();                       
             
-            for (size_t k = 0; k < sz; k++) {  // Внутренний цикл
+            for (size_t k = 0; k < sz; k++) { 
                 skal += (*this)[row][k] * m[k][col];
             }
             
@@ -286,15 +287,15 @@ public:
   // ввод/вывод
   friend istream& operator>>(istream& istr, TDynamicMatrix& v)
   {
-    for (size_t i = 0; i < m.sz; i++)
-      istr >> m.pMem[i];
+    for (size_t i = 0; i < v.sz; i++)
+      istr >> v.pMem[i];
     return istr;
   }
   friend ostream& operator<<(ostream& ostr, const TDynamicMatrix& v)
   {
-    for (size_t i = 0; i < m.sz; i++) {
-      for (size_t j = 0; j < m.sz; j++)
-        ostr << m.pMem[i][j] << ' ';
+    for (size_t i = 0; i < v.sz; i++) {
+      for (size_t j = 0; j < v.sz; j++)
+        ostr << v.pMem[i][j] << ' ';
       ostr << '\n';
     }
     return ostr;
