@@ -21,12 +21,27 @@ TEST(TDynamicMatrix, can_create_copied_matrix)
 {
   TDynamicMatrix<int> m(5);
 
-  ASSERT_NO_THROW(TDynamicMatrix<int> m1(m));
+  TDynamicMatrix<int> m(3);
+    for (size_t i = 0; i < 3; i++)
+        for (size_t j = 0; j < 3; j++)
+            m[i][j] = i * 3 + j;
+
+    TDynamicMatrix<int> m1(m);
+    EXPECT_EQ(m, m1);
 }
 
 TEST(TDynamicMatrix, copied_matrix_is_equal_to_source_one)
 {
-  ADD_FAILURE();
+  TDynamicMatrix<int> m(2);
+    m[0][0] = 1; m[0][1] = 2;
+    m[1][0] = 3; m[1][1] = 4;
+
+    TDynamicMatrix<int> m1(m);
+    m1[0][0] = 10; 
+
+    EXPECT_NE(m[0][0], m1[0][0]); 
+    EXPECT_EQ(m[0][0], 1);
+    EXPECT_EQ(m1[0][0], 10);
 }
 
 TEST(TDynamicMatrix, copied_matrix_has_its_own_memory)
