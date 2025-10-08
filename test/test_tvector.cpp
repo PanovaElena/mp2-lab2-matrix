@@ -405,3 +405,69 @@ TEST(TDynamicVector, cant_multiply_vectors_with_not_equal_size)
 	//ADD_FAILURE();
 }
 
+TEST(TDynamicVector, can_create_vector_with_move_semantics)
+{
+	int size = 5;
+	TDynamicVector<int> v1(size);
+	for (size_t i = 0; i < size; i++)
+		v1[i] = i;
+	TDynamicVector<int> v2(std::move(v1));
+
+	EXPECT_EQ(v1.size(), 0);
+	//EXPECT_EQ(v1[0], nullptr); +++++++++++++++++++++++++++++++++ Почему?
+	EXPECT_EQ(v2.size(), size);
+	for (size_t i = 0; i < v2.size(); i++)
+		EXPECT_EQ(v2[i], i);
+	//ADD_FAILURE();
+}
+
+TEST(TDynamicVector, move_assignment_operator_works_correctly)
+{
+	int size1 = 5;
+	int size2 = 3;
+	TDynamicVector<int> v1(size1);
+	TDynamicVector<int> v2(size2);
+	for (size_t i = 0; i < size1; i++)
+		v1[i] = i;
+	for (size_t i = 0; i < size2; i++)
+		v2[i] = i + 10;
+	v2 = std::move(v1);
+
+	EXPECT_EQ(v1.size(), 0);
+	EXPECT_EQ(v2.size(), size1);
+	for (size_t i = 0; i < v2.size(); i++)
+		EXPECT_EQ(v2[i], i);
+	//ADD_FAILURE();
+}
+
+TEST(TDynamicVector, moved_from_vector_can_be_reused)
+{
+	int size = 5;
+	TDynamicVector<int> v1(size);
+	for (size_t i = 0; i < size; i++)
+		v1[i] = i + 1;
+	TDynamicVector<int> v2 = std::move(v1);
+	v1 = TDynamicVector<int>(size);
+	for (size_t i = 0; i < size; i++)
+		v1[i] = i + 100;
+
+	EXPECT_EQ(v1.size(), size);
+	for (size_t i = 0; i < v1.size(); i++)
+		EXPECT_EQ(v1[i], i + 100);
+	//ADD_FAILURE();
+}
+
+TEST(TDynamicVector, self_move_assignment_does_not_crash)
+{
+	int size = 5;
+	TDynamicVector<int> v(size);
+	for (size_t i = 0; i < v.size(); i++)
+		v[i] = i;
+	v = std::move(v);
+
+	EXPECT_EQ(v.size(), size);
+	for (size_t i = 0; i < v.size(); i++)
+		EXPECT_EQ(v[i], i);
+	//ADD_FAILURE();
+}
+

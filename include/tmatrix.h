@@ -8,6 +8,8 @@
 #define __TDynamicMatrix_H__
 
 #include <iostream>
+#include <type_traits>
+#include <cmath>
 
 using namespace std;
 
@@ -112,19 +114,33 @@ public:
   // сравнение
   bool operator==(const TDynamicVector& v) const noexcept
   {
-      if (sz != v.sz) return false;
-      T epsilon = static_cast<T>(0);
-      if (std::is_same<T, float>::value)
-      {
-          epsilon = static_cast<T>(FLOAT_EPSILON);
-      }
-      if (std::is_same<T, double>::value)
-      {
-          epsilon = static_cast<T>(DOUBLE_EPSILON);
-      }
+      /*if (sz != v.sz) return false;
       for (size_t i = 0; i < sz; i++)
       {
-          if (std::abs(pMem[i] - v.pMem[i]) > epsilon) return false;
+          if (std::is_integral<T>::value)
+          {
+              if (pMem[i] != v.pMem[i])
+                  return false;
+          }
+          else if (std::is_same_v<T, float>::value)
+          {
+              if (std::abs(pMem[i] - v.pMem[i]) > static_cast<T>(FLOAT_EPSILON))
+                  return false;
+          }
+          else if (std::is_same_v<T, double>::value)
+          {
+              if (std::abs(pMem[i] - v.pMem[i]) > static_cast<T>(DOUBLE_EPSILON))
+                  return false;
+          }
+          else
+          {
+              if (pMem[i] != v.pMem[i]) return false;
+          }
+      }
+      return true;*/
+      if (sz != v.sz) return false;
+      for (size_t i = 0; i < sz; i++) {
+          if (pMem[i] != v.pMem[i]) return false;
       }
       return true;
   }

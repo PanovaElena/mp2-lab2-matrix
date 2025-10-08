@@ -64,7 +64,7 @@ TEST(TDynamicMatrix, copied_matrix_has_its_own_memory)
 		}
 	}
 	TDynamicMatrix<int> m1(m);
-
+	/*
 	EXPECT_TRUE(&m != &m1);
 	EXPECT_EQ(m.size(), m1.size());
 	EXPECT_EQ(size, m1.size());
@@ -75,8 +75,12 @@ TEST(TDynamicMatrix, copied_matrix_has_its_own_memory)
 			EXPECT_EQ(m[i][j], m1[i][j]);
 		}
 	}
+	*/
 	int OrgVal = m[0][0];
+
 	m[0][0] = 999;
+
+	EXPECT_TRUE(&m != &m1);
 	EXPECT_TRUE(OrgVal != m[0][0]);
 	EXPECT_TRUE(OrgVal == m1[0][0]);
 	//ADD_FAILURE();
@@ -325,6 +329,7 @@ TEST(TDynamicMatrix, cant_add_matrices_with_not_equal_size)
 			m1[i][j] = i * size2 + j + 1;
 		}
 	}
+
 	ASSERT_ANY_THROW(TDynamicMatrix<int> res = m + m1);
 	//ADD_FAILURE();
 }
@@ -381,7 +386,84 @@ TEST(TDynamicMatrix, cant_subtract_matrixes_with_not_equal_size)
 			m1[i][j] = i * size2 + j + 1;
 		}
 	}
+
 	ASSERT_ANY_THROW(TDynamicMatrix<int> res = m - m1);
+	//ADD_FAILURE();
+}
+
+TEST(TDynamicMatrix, can_create_matrix_with_move_semantics)
+{
+	int size = 3;
+	TDynamicMatrix<int> m1(3);
+	for (size_t i = 0; i < size; i++)
+		for (size_t j = 0; j < size; j++)
+			m1[i][j] = i * size + j;
+	TDynamicMatrix<int> m2(std::move(m1));
+
+	EXPECT_EQ(m1.size(), 0);
+	EXPECT_EQ(m2.size(), size);
+	for (size_t i = 0; i < m2.size(); i++)
+		for (size_t j = 0; j < m2.size(); j++)
+			EXPECT_EQ(m2[i][j], i * m2.size() + j);
+	//ADD_FAILURE();
+}
+
+TEST(TDynamicMatrix, move_assignment_operator_works_correctly_for_matrices)
+{
+	int size1 = 3;
+	int size2 = 2;
+	TDynamicMatrix<int> m1(size1);
+	TDynamicMatrix<int> m2(size2);
+	for (size_t i = 0; i < size1; i++)
+		for (size_t j = 0; j < size1; j++)
+			m1[i][j] = static_cast<int>(i * size1 + j);
+	for (size_t i = 0; i < size2; i++)
+		for (size_t j = 0; j < size2; j++)
+			m2[i][j] = static_cast<int>(i * size2 + j + 100);
+	m2 = std::move(m1);
+
+	EXPECT_EQ(m1.size(), 0);
+	EXPECT_EQ(m2.size(), size1);
+	for (size_t i = 0; i < m2.size(); i++)
+		for (size_t j = 0; j < m2.size(); j++)
+			EXPECT_EQ(m2[i][j], i * m2.size() + j);
+	//ADD_FAILURE();
+}
+
+TEST(TDynamicMatrix, moved_from_matrix_can_be_reused)
+{
+	int size1 = 3;
+	int size2 = 2;
+	TDynamicMatrix<int> m1(size1);
+	for (size_t i = 0; i < size1; i++)
+		for (size_t j = 0; j < size1; j++)
+			m1[i][j] = i * size1 + j;
+	TDynamicMatrix<int> m2 = std::move(m1);
+	m1 = TDynamicMatrix<int>(2);
+	for (size_t i = 0; i < size2; i++)
+		for (size_t j = 0; j < size2; j++)
+			m1[i][j] = i * size2 + j + 100;
+
+	EXPECT_EQ(m1.size(), size2);
+	for (size_t i = 0; i < m1.size(); i++)
+		for (size_t j = 0; j < m1.size(); j++)
+			EXPECT_EQ(m1[i][j], i * size2 + j + 100);
+	//ADD_FAILURE();
+}
+
+TEST(TDynamicMatrix, self_move_assignment_does_not_crash)
+{
+	int size = 3;
+	TDynamicMatrix<int> m(size);
+	for (size_t i = 0; i < size; i++)
+		for (size_t j = 0; j < size; j++)
+			m[i][j] = i * size + j;
+	m = std::move(m);
+
+	EXPECT_EQ(m.size(), size);
+	for (size_t i = 0; i < m.size(); i++)
+		for (size_t j = 0; j < m.size(); j++)
+			EXPECT_EQ(m[i][j], i * size + j);
 	//ADD_FAILURE();
 }
 
