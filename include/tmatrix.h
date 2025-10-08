@@ -185,7 +185,7 @@ public:
       }
       return result;
   }
-  T operator*(const TDynamicVector& v) const noexcept(noexcept(T()))
+  T operator*(const TDynamicVector& v) const
   {
       if (sz != v.sz) {
           throw std::invalid_argument("Vectors sizes are not equal");
