@@ -264,14 +264,14 @@ public:
   // ввод/вывод
   friend istream& operator>>(istream& istr, TDynamicMatrix& v)
   {
-    for(int i = 0; i < v.sz; ++i) istr >> v[i];
+    for(int i = 0; i < v.sz; ++i) istr >> v.pMem[i];
     return istr;
   }
   friend ostream& operator<<(ostream& ostr, const TDynamicMatrix& v)
   {
     for(int i = 0; i < v.sz; ++i)
       for(int j = 0; j < v.sz; ++j)
-        ostr << v[i][j] << ' ' << (j == (v.sz - 1) ? '\n' : "");
+        ostr << v.pMem[i][j] << ' ' << (j == (v.sz - 1) ? "\n" : "");
     return ostr;
   }
 };
