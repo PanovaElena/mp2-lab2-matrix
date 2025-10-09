@@ -33,7 +33,7 @@ public:
           throw out_of_range("Vector size should be greater than zero");
       if (sz > MAX_VECTOR_SIZE)
           throw out_of_range("Vector is too large");
-      pMem = new T[sz]();// {}; // У типа T д.б. констуктор по умолчанию
+      pMem = new T[sz]();
   }
   TDynamicVector(T* arr, size_t s) : sz(s)
   {
@@ -154,7 +154,7 @@ public:
       }
       return res;
   }
-  TDynamicVector operator-(T val)//Тут было double val. WHY???
+  TDynamicVector operator-(T val)
   {
       TDynamicVector res(sz);
       for (size_t i = 0; i < sz; i++)
@@ -163,7 +163,7 @@ public:
       }
       return res;
   }
-  TDynamicVector operator*(T val)//Тут было double val. WHY???
+  TDynamicVector operator*(T val)
   {
       TDynamicVector res(sz);
       for (size_t i = 0; i < sz; i++)
@@ -196,16 +196,16 @@ public:
       }
       return res;
   }
-  T operator*(const TDynamicVector& v) //cant_multiply_vectors_with_not_equal_size, but it should be noexcept(noexcept(T()))???
+  T operator*(const TDynamicVector& v)
   {
       if (sz != v.sz)
           throw invalid_argument("Vector sizes are not EQ");
       T result = T();
       for (size_t i = 0; i < sz; i++)
       {
-          result += pMem[i] * v.pMem[i];  // Суммируем произведения
+          result += pMem[i] * v.pMem[i];
       }
-      return result;  // Возвращаем скаляр
+      return result;
   }
 
   friend void swap(TDynamicVector& lhs, TDynamicVector& rhs) noexcept
@@ -218,13 +218,13 @@ public:
   friend istream& operator>>(istream& istr, TDynamicVector& v)
   {
     for (size_t i = 0; i < v.sz; i++)
-      istr >> v.pMem[i]; // требуется оператор>> для типа T
+      istr >> v.pMem[i];
     return istr;
   }
   friend ostream& operator<<(ostream& ostr, const TDynamicVector& v)
   {
     for (size_t i = 0; i < v.sz; i++)
-      ostr << v.pMem[i] << ' '; // требуется оператор<< для типа T
+      ostr << v.pMem[i] << ' ';
     return ostr;
   }
 };
@@ -253,7 +253,7 @@ public:
   }
 
   using TDynamicVector<TDynamicVector<T>>::operator[];
-  size_t size() const noexcept { return sz; }//Как это можно было не добавить в .h файл?
+  size_t size() const noexcept { return sz; }
 
   // сравнение
   bool operator==(const TDynamicMatrix& m) const noexcept

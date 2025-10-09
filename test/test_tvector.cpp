@@ -414,7 +414,6 @@ TEST(TDynamicVector, can_create_vector_with_move_semantics)
 	TDynamicVector<int> v2(std::move(v1));
 
 	EXPECT_EQ(v1.size(), 0);
-	//EXPECT_EQ(v1[0], nullptr); +++++++++++++++++++++++++++++++++ Почему?
 	EXPECT_EQ(v2.size(), size);
 	for (size_t i = 0; i < v2.size(); i++)
 		EXPECT_EQ(v2[i], i);
