@@ -114,7 +114,7 @@ public:
   // сравнение
   bool operator==(const TDynamicVector& v) const noexcept
   {
-      /*if (sz != v.sz) return false;
+      if (sz != v.sz) return false;
       for (size_t i = 0; i < sz; i++)
       {
           if (std::is_integral<T>::value)
@@ -122,12 +122,12 @@ public:
               if (pMem[i] != v.pMem[i])
                   return false;
           }
-          else if (std::is_same_v<T, float>::value)
+          else if (std::is_same<T, float>::value)
           {
               if (std::abs(pMem[i] - v.pMem[i]) > static_cast<T>(FLOAT_EPSILON))
                   return false;
           }
-          else if (std::is_same_v<T, double>::value)
+          else if (std::is_same<T, double>::value)
           {
               if (std::abs(pMem[i] - v.pMem[i]) > static_cast<T>(DOUBLE_EPSILON))
                   return false;
@@ -136,11 +136,6 @@ public:
           {
               if (pMem[i] != v.pMem[i]) return false;
           }
-      }
-      return true;*/
-      if (sz != v.sz) return false;
-      for (size_t i = 0; i < sz; i++) {
-          if (pMem[i] != v.pMem[i]) return false;
       }
       return true;
   }
