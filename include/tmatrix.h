@@ -177,7 +177,7 @@ public:
         return res;
     }
 
-    T operator*(const TDynamicVector& v) noexcept(noexcept(T()))
+    T operator*(const TDynamicVector& v) 
     {
         if (sz != v.sz)
             throw invalid_argument("Error!");
