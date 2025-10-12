@@ -240,10 +240,8 @@ TEST(TDynamicVector, can_multiply_vectors_with_equal_size)
 
 TEST(TDynamicVector, cant_multiply_vectors_with_not_equal_size)
 {
-	TDynamicVector<int> v1(3);
-	TDynamicVector<int> v2(5);
-
-	ASSERT_ANY_THROW(v1 * v2);
+	TDynamicVector<int> v1(3), v2(2);
+	EXPECT_ANY_THROW(v1 * v2);
 }
 
 TEST(TDynamicVector, move_constructor_works_correctly)

@@ -27,9 +27,7 @@ protected:
 public:
     TDynamicVector(size_t size = 1) : sz(size)
     {
-        if (sz == 0)
-            throw invalid_argument("Error!");
-        if (sz > MAX_VECTOR_SIZE)
+        if (sz == 0 || sz > MAX_VECTOR_SIZE)
             throw out_of_range("Error!");
         pMem = new T[sz]();// {}; // У типа T д.б. констуктор по умолчанию
     }
@@ -343,7 +341,6 @@ public:
         for (size_t i = 0; i < m.sz; i++) {
             for (size_t j = 0; j < m.sz; j++)
                 ostr << m.pMem[i][j] << ' ';
-            ostr << '\n';
         }
         return ostr;
     }
