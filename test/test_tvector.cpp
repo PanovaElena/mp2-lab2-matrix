@@ -197,13 +197,13 @@ TEST(TDynamicVector, can_multiply_vectors_with_equal_size) {
     
     int res = v * v1;
     
-    EXPECT_EQ(32, res); // 1*4 + 2*5 + 3*6 = 4 + 10 + 18 = 32
+    EXPECT_EQ(32, res); // 1*4 + 2*5 + 3*6 = 4 + 10 + 18 = 32 вроде как будто
 }
 
-/*TEST(TDynamicVector, cant_multiply_vectors_with_not_equal_size) {
+TEST(TDynamicVector, cant_multiply_vectors_with_not_equal_size) {
     TDynamicVector<int> v(3), v1(2);
     ASSERT_ANY_THROW(v * v1);
-}*/
+}
 
 // Тесты move-семантики
 TEST(TDynamicVector, can_create_vector_with_move_semantics) {

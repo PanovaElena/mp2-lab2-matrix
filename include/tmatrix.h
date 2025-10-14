@@ -154,7 +154,7 @@ public:
 
     return res;
   }
-  T operator*(const TDynamicVector& v) noexcept(noexcept(T()))
+  T operator*(const TDynamicVector& v) //noexcept(noexcept(T()))
   {
     if(sz != v.sz) throw invalid_argument("Error");
 
@@ -175,13 +175,13 @@ public:
   friend istream& operator>>(istream& istr, TDynamicVector& v)
   {
     for (size_t i = 0; i < v.sz; i++)
-      istr >> v.pMem[i]; // требуется оператор>> для типа T
+      istr >> v.pMem[i];
     return istr;
   }
   friend ostream& operator<<(ostream& ostr, const TDynamicVector& v)
   {
     for (size_t i = 0; i < v.sz; i++)
-      ostr << v.pMem[i] << ' '; // требуется оператор<< для типа T
+      ostr << v.pMem[i] << ' '; 
     return ostr;
   }
 };
@@ -190,7 +190,7 @@ public:
 // Динамическая матрица - 
 // шаблонная матрица на динамической памяти
 template<typename T>
-class TDynamicMatrix : private TDynamicVector<TDynamicVector<T>>
+class TDynamicMatrix : public TDynamicVector<TDynamicVector<T>>
 {
   using TDynamicVector<TDynamicVector<T>>::pMem;
   using TDynamicVector<TDynamicVector<T>>::sz;
@@ -204,6 +204,22 @@ public:
   }
 
   using TDynamicVector<TDynamicVector<T>>::operator[];
+
+  TDynamicVector<T>& at(size_t ind)
+{
+    if (ind < sz) 
+        return pMem[ind];
+    else 
+        throw out_of_range("Error");
+}
+
+const TDynamicVector<T>& at(size_t ind) const
+{
+    if (ind < sz) 
+        return pMem[ind];
+    else 
+        throw out_of_range("error");
+}
 
   size_t size() const noexcept { return sz; } //?
 
