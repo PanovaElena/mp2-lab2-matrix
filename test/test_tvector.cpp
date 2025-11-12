@@ -277,3 +277,12 @@ TEST(TDynamicVector, cant_multiply_vectors_with_not_equal_size)
 
     EXPECT_ANY_THROW(v1 * v2);
 }
+
+TEST(TDynamicVector, move_semantics_works_for_vector)
+{
+    TDynamicVector<int> destination(3), vector(3);
+    vector[1] = 14;
+    destination = std::move(vector);
+    EXPECT_TRUE(vector.empty());
+    EXPECT_EQ(destination[1], 14);
+}

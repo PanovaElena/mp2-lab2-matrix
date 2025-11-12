@@ -77,7 +77,7 @@ public:
   }
 
   size_t size() const noexcept { return sz; }
-
+  bool empty() const noexcept { return pMem == nullptr; }
   // индексация
   T& operator[](size_t ind)
   {
@@ -207,7 +207,7 @@ public:
   using TDynamicVector<TDynamicVector<T>>::operator[];
   using TDynamicVector<TDynamicVector<T>>::at;
   size_t size() const noexcept { return sz; }
-
+  bool empty() const noexcept { return pMem == nullptr; }
   // сравнение
   bool operator==(const TDynamicMatrix& m) const noexcept
   {

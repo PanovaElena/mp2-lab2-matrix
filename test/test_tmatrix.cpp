@@ -256,3 +256,12 @@ TEST(TDynamicMatrix, cant_multiply_matrices_with_not_equal_size)
     
     EXPECT_ANY_THROW(m1 * m2);
 }
+
+TEST(TDynamicMatrix, move_semantics_works_for_matrix)
+{
+    TDynamicMatrix<int> destination(3), matrix(3);
+    matrix[0][1] = 14;
+    destination = std::move(matrix);
+    EXPECT_TRUE(matrix.empty());
+    EXPECT_EQ(destination[0][1], 14);
+}
