@@ -35,21 +35,45 @@ public:
     pMem = new T[sz];
     std::copy(arr, arr + sz, pMem);
   }
-  TDynamicVector(const TDynamicVector& v)
+  TDynamicVector(const TDynamicVector& v) : sz(v.sz)
   {
+    pMem = new T[sz]();
+    for (size_t i = 0; i < sz; i++) {
+      pMem[i] = v.pMem[i];
+    }
   }
-  TDynamicVector(TDynamicVector&& v) noexcept
+  TDynamicVector(TDynamicVector&& v) noexcept : sz(v.sz)
   {
+    pMem = v.pMem;
+    v.pMem = NULL;
   }
   ~TDynamicVector()
   {
+    delete[] pMem;
   }
   TDynamicVector& operator=(const TDynamicVector& v)
   {
+    if (this == &v) {
+      return *this;
+    }
+    sz = v.sz;
+    delete[] pMem;
+    pMem = new T[sz]();
+    for (size_t i = 0; i < sz; i++) {
+      pMem[i] = v.pMem[i];
+    }
+    return *this;
   }
   TDynamicVector& operator=(TDynamicVector&& v) noexcept
   {
+    if (this == &v) {
       return *this;
+    }
+    sz = v.sz;
+    delete[] pMem;
+    pMem = v.pMem;
+    v.pMem = NULL;
+    return *this;
   }
 
   size_t size() const noexcept { return sz; }
