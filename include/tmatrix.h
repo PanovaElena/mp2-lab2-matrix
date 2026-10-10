@@ -27,7 +27,7 @@ class TDynamicVector
   public:
     TDynamicVector(size_t size = 1) : sz(size)
     {
-      if (sz == 0)
+      if (sz == 0 || sz > MAX_MATRIX_SIZE)
         throw std::out_of_range("Vector size should be greater than zero");
       pMem = new T[sz]();// {}; // У типа T д.б. констуктор по умолчанию
     }
@@ -126,21 +126,21 @@ class TDynamicVector
     }
 
     // скалярные операции
-    TDynamicVector operator+(T val) const
+    TDynamicVector operator+(const T& val) const
     {
       TDynamicVector<T> tmp(sz);
       for (size_t i = 0; i < sz; i++) {tmp.pMem[i] = pMem[i] + val;} 
 
       return tmp;
     }
-    TDynamicVector operator-(double val) const
+    TDynamicVector operator-(const T& val) const
     {
       TDynamicVector<T> tmp(sz);
       for (size_t i = 0; i < sz; i++) {tmp.pMem[i] = pMem[i] - val;} 
 
       return tmp;
     }
-    TDynamicVector operator*(double val) const
+    TDynamicVector operator*(const T& val) const
     {
       TDynamicVector<T> tmp(sz);
       for (size_t i = 0; i < sz; i++) {tmp.pMem[i] = pMem[i] * val;} 
@@ -173,7 +173,7 @@ class TDynamicVector
 
       return tmp;
     }
-    T operator*(const TDynamicVector& v) const noexcept(noexcept(T())) 
+    T operator*(const TDynamicVector& v) const //noexcept(noexcept(T())) 
     {
       if (sz != v.sz){
         throw std::out_of_range("Vectori doljni bit' odinakovoi dlini");
@@ -210,52 +210,120 @@ class TDynamicVector
 
 // Динамическая матрица - 
 // шаблонная матрица на динамической памяти
+
+
 template<typename T>
 class TDynamicMatrix : private TDynamicVector<TDynamicVector<T>>
 {
   using TDynamicVector<TDynamicVector<T>>::pMem;
   using TDynamicVector<TDynamicVector<T>>::sz;
 public:
-  TDynamicMatrix(size_t s = 1) : TDynamicVector<TDynamicVector<T>>(s)
-  {
-    for (size_t i = 0; i < sz; i++)
-      pMem[i] = TDynamicVector<T>(sz);
+  
+  TDynamicMatrix (size_t size = 1) : TDynamicVector<TDynamicVector<T>>(size){
+    if (sz == 0 || sz > MAX_MATRIX_SIZE){
+      throw std::out_of_range("Matrica doljna bit' < 10000");
+    }
+    for (size_t i = 0; i < sz; i++){
+      pMem[i] = TDynamicVector(sz);
+    }
   }
 
   using TDynamicVector<TDynamicVector<T>>::operator[];
 
   // сравнение
+  
   bool operator==(const TDynamicMatrix& m) const noexcept
   {
+    //polzuemsya tem, chto v vectore eto vseo realizovano
+    return static_cast<const TDynamicVector<TDynamicVector<T>>&>(*this) == static_cast<const TDynamicVector<TDynamicVector<T>>&>(m) ;
   }
 
   // матрично-скалярные операции
-  TDynamicVector<T> operator*(const T& val)
+  TDynamicMatrix operator*(const T& val) const
   {
+    TDynamicMatrix<T> tmp(sz);
+
+    for (size_t i = 0; i < sz; i++) {tmp[i] = pMem[i] * val;}
+    return tmp;
   }
 
   // матрично-векторные операции
-  TDynamicVector<T> operator*(const TDynamicVector<T>& v)
+  TDynamicVector<T> operator*(const TDynamicVector<T>& v) const
   {
+    if (sz != v.sz){
+      throw std::out_of_range("doljni bit' ravni razmeri");
+    }
+
+    TDynamicVector<T> tmp(sz);
+
+    for (size_t i = 0; i < sz; i++){
+      tmp[i] = pMem[i] * v;
+    }
+    return tmp;
   }
 
   // матрично-матричные операции
-  TDynamicMatrix operator+(const TDynamicMatrix& m)
+  TDynamicMatrix operator+(const TDynamicMatrix& m) const
   {
-  }
-  TDynamicMatrix operator-(const TDynamicMatrix& m)
-  {
-  }
-  TDynamicMatrix operator*(const TDynamicMatrix& m)
-  {
-  }
+    if (sz != m.sz){
+      throw std::out_of_range("Matrici doljni bit' odinakovoi razmernosti");
+    }
 
+    TDynamicMatrix<T> tmp(sz);
+
+    for (size_t i = 0; i < sz; i++){
+      tmp[i] = pMem[i] + m[i];
+    }
+
+    return tmp;
+  }
+  TDynamicMatrix operator-(const TDynamicMatrix& m) const
+  {
+    if (sz != m.sz){
+      throw std::out_of_range("Matrici doljni bit' odinakovoi razmernosti");
+    }
+
+    TDynamicMatrix<T> tmp(sz);
+
+    for (size_t i = 0; i < sz; i++){
+      tmp[i] = pMem[i] - m[i];
+    }
+
+    return tmp;
+  }
+  TDynamicMatrix operator*(const TDynamicMatrix& m) const
+  {
+    if (sz != m.sz){
+      throw std::out_of_range("Matrici doljni bit' odinakovoi razmernosti");
+    }
+
+    TDynamicMatrix<T> tmp(sz);
+
+    for (size_t i = 0; i < sz; i++){
+      for (size_t k = 0; k < sz; k++){ // resultat takoi je, zato vsegda na odnoi stroke nahodimsya,
+        for (size_t j = 0; j < sz; j++){   // po pamyaty ne prigaem, a gladko idem!!
+          tmp[i][j] += pMem[i][k] * m[k][j];
+        }
+      }
+    }
+    return tmp;
+  }
+  
   // ввод/вывод
   friend std::istream& operator>>(std::istream& istr, TDynamicMatrix& v)
   {
+    for (size_t i = 0; i < v.sz; i++){
+      istr >> v[i];
+    }
+    return istr;
   }
   friend std::ostream& operator<<(std::ostream& ostr, const TDynamicMatrix& v)
   {
+    for (size_t i = 0; i < v.sz; i++){
+      ostr << v[i] << '\n';
+    }
+
+    return ostr;
   }
 };
 
