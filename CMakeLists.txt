@@ -33,5 +33,5 @@ message( STATUS "   Configuration: ${CMAKE_BUILD_TYPE}")
 message( STATUS "")
 
 if(MSVC)
-    add_compile_definitions(_VARIADIC_MAX=10 GTEST_LANG_CXX11=1 GTEST_HAS_TR1_TUPLE=1)
+    add_compile_definitions(_VARIADIC_MAX=10 GTEST_HAS_TR1_TUPLE=1 GTEST_USE_OWN_TR1_TUPLE=1)
 endif()
