@@ -10,7 +10,7 @@
 #include <cstddef>
 #include <iostream>
 #include <stdexcept>
-
+#include <cassert>
 
 
 const int MAX_VECTOR_SIZE = 100000000;
@@ -224,7 +224,7 @@ public:
       throw std::out_of_range("Matrica doljna bit' < 10000");
     }
     for (size_t i = 0; i < sz; i++){
-      pMem[i] = TDynamicVector(sz);
+      pMem[i] = TDynamicVector<T>(sz);
     }
   }
 
@@ -308,7 +308,7 @@ public:
     }
     return tmp;
   }
-  
+
   // ввод/вывод
   friend std::istream& operator>>(std::istream& istr, TDynamicMatrix& v)
   {
