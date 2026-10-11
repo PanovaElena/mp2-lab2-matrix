@@ -31,3 +31,7 @@ message( STATUS "======================================")
 message( STATUS "")
 message( STATUS "   Configuration: ${CMAKE_BUILD_TYPE}")
 message( STATUS "")
+
+if(MSVC)
+    add_compile_definitions(_VARIADIC_MAX=10 GTEST_HAS_TR1_TUPLE=1)
+endif()
