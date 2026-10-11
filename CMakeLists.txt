@@ -6,7 +6,13 @@ set(PROJECT_NAME matrix)
 project(${PROJECT_NAME})
 
 include(CTest)
-enable_testing()  # defines BUILD_TESTING
+enable_testing()
+
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+add_compile_definitions(GTEST_HAS_TR1_TUPLE=0)
 
 set(MP2_TESTS   "test_${PROJECT_NAME}")
 set(MP2_CUSTOM_PROJECT "${PROJECT_NAME}")
@@ -23,8 +29,6 @@ if(BUILD_TESTING)
 	add_subdirectory(test)
 endif()
 
-
-# REPORT
 message( STATUS "")
 message( STATUS "General configuration for ${PROJECT_NAME}")
 message( STATUS "======================================")
