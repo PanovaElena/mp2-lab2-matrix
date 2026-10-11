@@ -26,12 +26,13 @@ TEST(TDynamicVector, can_create_copied_vector)
 
 TEST(TDynamicVector, copied_vector_is_equal_to_source_one)
 {
-  int arr[] = {1,2,3,4,5};
+  //vectory budem zapolnyat' cherez konstructor preobrazovaniya tipov (arr -> vector)
+  int arr[] = {1,2,3,4,5}; 
   TDynamicVector<int> v(arr, 5);
-  TDynamicVector<int> v_1(v);
+  TDynamicVector<int> v1(v);
 
 
-  EXPECT_EQ(v_1, v);
+  EXPECT_EQ(v1, v);
 }
 TEST(TDynamicVector, copied_vector_has_its_own_memory)
 {
@@ -51,13 +52,13 @@ TEST(TDynamicVector, can_get_size)
   EXPECT_EQ(4, v.size());
 }
 
-//TEST(TDynamicVector, can_set_and_get_element)
-//{
-//  TDynamicVector<int> v(4);
-//  v[0] = 4;
-//
-//  EXPECT_EQ(4, v[0]);
-//}
+TEST(TDynamicVector, can_set_and_get_element)
+{
+  TDynamicVector<int> v(4);
+  v[0] = 4;
+
+  EXPECT_EQ(4, v[0]);
+}
 
 TEST(TDynamicVector, throws_when_set_element_with_negative_index)
 {
@@ -149,7 +150,7 @@ TEST(TDynamicVector, vectors_with_different_size_are_not_equal)
   int arr1[] = {2,3,4,5};
   TDynamicVector<int> v1(arr1, 4);
 
-  EXPECT_FALSE(v.size() == v1.size());
+  EXPECT_FALSE(v == v1);
 }
 
 TEST(TDynamicVector, can_add_scalar_to_vector)

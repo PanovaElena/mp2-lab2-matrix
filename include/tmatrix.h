@@ -228,8 +228,9 @@ public:
     }
   }
 
+  using TDynamicVector<TDynamicVector<T>>::at;        // zachem pisat' noviy, esli uje vseo est'!
   using TDynamicVector<TDynamicVector<T>>::operator[];
-
+  using TDynamicVector<TDynamicVector<T>>::size;
   // сравнение
   
   bool operator==(const TDynamicMatrix& m) const noexcept
