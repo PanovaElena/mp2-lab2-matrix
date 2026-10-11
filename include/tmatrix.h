@@ -81,24 +81,44 @@ public:
   // индексация
   T& operator[](size_t ind)
   {
+    return pMem[ind];
   }
   const T& operator[](size_t ind) const
   {
+    return pMem[ind];
   }
   // индексация с контролем
   T& at(size_t ind)
   {
+    if (ind >= sz) {
+      throw out_of_range("The index should be less than the size of vector");
+    }
+    return pMem[ind];
   }
   const T& at(size_t ind) const
   {
+    if (ind >= sz) {
+      throw out_of_range("The index should be less than the size of vector");
+    }
+    return pMem[ind];
   }
 
   // сравнение
   bool operator==(const TDynamicVector& v) const noexcept
   {
+    if (sz != v.sz) {
+      return false;
+    }
+    for (size_t i = 0; i < sz; i++) {
+      if (pMem[i] != v.pMem[i]) {
+        return false;
+      }
+    }
+    return true;
   }
   bool operator!=(const TDynamicVector& v) const noexcept
   {
+    return !(*this == v);
   }
 
   // скалярные операции
