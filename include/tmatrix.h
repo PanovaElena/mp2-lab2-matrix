@@ -235,7 +235,10 @@ public:
     return TDynamicVector<TDynamicVector<T>>::operator==(m);
   }
 
-  using TDynamicVector<TDynamicVector<T>>::operator!=;
+  bool operator!=(const TDynamicMatrix& m) const noexcept
+  {
+    return !(*this == m);
+  }
 
   // матрично-скалярные операции
   TDynamicMatrix operator*(const T& val) //тут поменял возвращаемое значение с TDynamicVector<T>
