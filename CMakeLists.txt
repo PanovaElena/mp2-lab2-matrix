@@ -32,6 +32,7 @@ message( STATUS "")
 message( STATUS "   Configuration: ${CMAKE_BUILD_TYPE}")
 message( STATUS "")
 
-if(MSVC)
-    add_compile_definitions(_VARIADIC_MAX=10 GTEST_HAS_TR1_TUPLE=0)
-endif()
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+add_definitions(-DGTEST_HAS_TR1_TUPLE=0)
