@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-option(BUILD_SAMPLES ON)
+option(BUILD_SAMPLES "Build sample applications" ON)
 
 set(PROJECT_NAME matrix)
 project(${PROJECT_NAME})
