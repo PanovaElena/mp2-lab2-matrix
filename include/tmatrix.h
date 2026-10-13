@@ -29,12 +29,18 @@ public:
   {
     if (sz == 0)
       throw out_of_range("Vector size should be greater than zero");
+    if (sz > MAX_VECTOR_SIZE)
+      throw out_of_range("Vector size is greater than MAX_VECTOR_SIZE = 100000000 or negative");
     pMem = new T[sz]();// {}; // У типа T д.б. конструктор по умолчанию
     // уже инициализируется по умолчанию нулями из-за (). инициализация пустым значением
   }
   TDynamicVector(T* arr, size_t s) : sz(s) //создается TDynamicVector из массива С
   {
     assert(arr != nullptr && "TDynamicVector ctor requires non-nullptr arg"); // Макрос для поиска багов: если arr равен nullptr, программа упадет и выведет этот текст в консоль
+    if (sz == 0)
+      throw out_of_range("Vector size should be greater than zero");
+    if (sz > MAX_VECTOR_SIZE)
+      throw out_of_range("Vector size is greater than MAX_VECTOR_SIZE = 100000000 or negative");
     pMem = new T[sz];
     std::copy(arr, arr + sz, pMem);
   }
@@ -217,6 +223,10 @@ class TDynamicMatrix : private TDynamicVector<TDynamicVector<T>> //наслед�
 public:
   TDynamicMatrix(size_t s = 1) : TDynamicVector<TDynamicVector<T>>(s)
   {
+    if (sz == 0)
+      throw out_of_range("Vector size should be greater than zero");
+    if (sz > MAX_MATRIX_SIZE)
+      throw out_of_range("Vector size is greater than MAX_MATRIX_SIZE = 10000 or negative");
     for (size_t i = 0; i < sz; i++)
       pMem[i] = TDynamicVector<T>(sz);
   }
