@@ -11,7 +11,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <cassert>
-
+#include <vector>
 
 const int MAX_VECTOR_SIZE = 100000000;
 const int MAX_MATRIX_SIZE = 10000;
@@ -302,7 +302,7 @@ public:
 
     for (size_t i = 0; i < sz; i++){
       for (size_t k = 0; k < sz; k++){ // resultat takoi je, zato vsegda na odnoi stroke nahodimsya,
-        for (size_t j = 0; j < sz; j++){   // po pamyaty ne prigaem, a gladko idem!!
+        for (size_t j = 0; j < sz; j++){   // po pamyaty ne prigaem, gladko idem!!
           tmp[i][j] += pMem[i][k] * m[k][j];
         }
       }
@@ -326,6 +326,117 @@ public:
 
     return ostr;
   }
+};
+
+
+
+// CSR
+
+
+
+template <typename T>
+class TCSRmatrix{
+  
+  size_t row_count;
+  size_t col_count;
+
+  std::vector<T> values;
+  std::vector<size_t> col_index;
+  std::vector<size_t> row_ptr;
+  
+  public:
+
+  TCSRmatrix (size_t row = 1, size_t col = 1) : row_count(row), col_count(col), row_ptr(row + 1) {}
+
+  TCSRmatrix (const TDynamicMatrix<T>& m) : row_count(m.size()), col_count(m.size()), row_ptr(m.size() + 1) //kontructor preobrazovaniya v CSRmatrix
+  {
+
+    if (m.size() >= MAX_MATRIX_SIZE || m.size() == 0){ throw std::out_of_range("Size matrice doljni bit' 0 < x <= MAX_MATRIX_SIZE");}
+
+    for (size_t i = 0; i < row_count; i++){
+      for(size_t j = 0; j < col_count; j++){
+        
+        if (m[i][j] != 0){
+          values.push_back(m[i][j]);
+          col_index.push_back(j);
+        }
+
+      }
+      row_ptr[i + 1] = values.size(); // count_not_zero_elem[i] = row_ptr[i + 1] - row_ptr[i]
+    }
+  }
+
+  TCSRmatrix (const TCSRmatrix<T>& m) = default; // puskai compilyator vseo sam sdelaet:)
+  
+
+  T at(size_t row, size_t col) const{
+    
+    if (row >= row_count || col >= col_count) { throw std::out_of_range("Index doljen bit' < row_count and < col_count"); }
+
+    //indexi elemntov i-th stroki prinadlejat polu-intervalu [ row_ptr[i], row_ptr[i + 1] )
+    size_t start = row_ptr[row]; 
+    size_t end = row_ptr[row + 1];
+
+    for (size_t j = start; j < end; j++){
+      if (col_index[j] > col){  //v etoi stroke uje ne budet nenulevogo elem, vihodim iz sycle
+        return T{};
+      }
+      if (col_index[j] == col){
+        return values[j];
+      }
+    }
+
+    return T{}; // if start = end (popalas' nulevaya stroka)
+  }
+
+  size_t get_row() const { return row_count;}
+
+  size_t get_col() const { return col_count;}
+
+  void set(size_t row, size_t col, T val){
+
+    if (row >= row_count || col >= col_count) { throw std::out_of_range("Index doljen bit' < row_count and < col_count"); }
+
+    size_t start = row_ptr[row]; 
+    size_t end = row_ptr[row + 1];
+    size_t insertion_index = end;
+
+    for (size_t j = start; j < end; j++){
+      
+      if (col_index[j] == col){
+
+         if (val == T{}){  // if zamenyem nenulevoi elem nulevim elem
+            values.erase(values.begin() + j);
+            col_index.erase(col_index.begin() + j);
+            for (size_t k = row + 1; k < row_count + 1; k++) {row_ptr[k]--; }
+         }
+         else{          //tupo menyem znachenie
+            values[j] = val;
+         }
+         
+         return;
+      }
+      if (col_index[j] > col){
+        insertion_index = j;
+        break;
+      }
+    }
+    //esli popali v 0
+    if (val != T{}){   // if val = T{} , to nichego ne delaem
+
+      values.insert(values.begin() + insertion_index, val);
+      col_index.insert(col_index.begin() + insertion_index, col);
+      for (size_t k = row + 1; k < row_count + 1; k++) {row_ptr[k]++; }
+    }
+  }
+
+  TCSRmatrix operator*(const T& val) const{
+
+    
+  }
+
+
+
 };
 
 #endif
