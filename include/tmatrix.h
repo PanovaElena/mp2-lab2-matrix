@@ -301,7 +301,7 @@ public:
   {
       for (size_t i = 0; i < v.sz; i++)
       {
-          istr >> m.pMem[i]; 
+          istr >> v.pMem[i]; 
       }
       return istr;
   }
