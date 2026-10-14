@@ -26,86 +26,162 @@ TEST(TDynamicMatrix, can_create_copied_matrix)
 
 TEST(TDynamicMatrix, copied_matrix_is_equal_to_source_one)
 {
-  ADD_FAILURE();
+	TDynamicMatrix<int> m(2);
+	m = 1; m = 2;
+	m = 3; m = 4;
+
+	TDynamicMatrix<int> m1(m);
+
+	for (size_t i = 0; i < m[0].size(); i++)
+	{
+		EXPECT_EQ(m[i], m1[i]);
+	}
 }
 
 TEST(TDynamicMatrix, copied_matrix_has_its_own_memory)
 {
-  ADD_FAILURE();
+	TDynamicMatrix<int> m(2);
+	m[0][0] = 1; m[0][1] = 2;
+	m[1][0] = 3; m[1][1] = 4;
+
+	TDynamicMatrix<int> m1(m);
+	m1[0][0] = 99; // Меняем элемент в копии
+
+	// Построчно проверяем, что матрицы стали НЕ равны
+	bool is_equal = true;
+	for (size_t i = 0; i < m[0].size(); i++)
+	{
+		if (m[i] != m1[i])
+		{
+			is_equal = false;
+			break;
+		}
+	}
+	EXPECT_FALSE(is_equal);
 }
 
 TEST(TDynamicMatrix, can_get_size)
 {
-  ADD_FAILURE();
+	TDynamicMatrix<int> m(7);
+
+	EXPECT_EQ(7u, m[0].size());
 }
 
 TEST(TDynamicMatrix, can_set_and_get_element)
 {
-  ADD_FAILURE();
+	TDynamicMatrix<int> m(3);
+	m[1][2] = 42;
+
+	EXPECT_EQ(42, m[1][2]);
 }
 
 TEST(TDynamicMatrix, throws_when_set_element_with_negative_index)
 {
-  ADD_FAILURE();
+	TDynamicMatrix<int> m(3);
+	// Обращаемся по индексу к строкам (которые являются открытыми векторами), 
+	// поэтому контроль границ на невалидный индекс проверяем через .at() строки
+	ASSERT_ANY_THROW(m[0].at(-1));
 }
 
 TEST(TDynamicMatrix, throws_when_set_element_with_too_large_index)
 {
-  ADD_FAILURE();
+	TDynamicMatrix<int> m(3);
+	ASSERT_ANY_THROW(m[0].at(3));
 }
 
 TEST(TDynamicMatrix, can_assign_matrix_to_itself)
 {
-  ADD_FAILURE();
+	TDynamicMatrix<int> m(3);
+	m[0][0] = 5;
+
+	ASSERT_NO_THROW(m = m);
+	EXPECT_EQ(5, m[0][0]);
 }
 
 TEST(TDynamicMatrix, can_assign_matrices_of_equal_size)
 {
-  ADD_FAILURE();
+	TDynamicMatrix<int> m1(2), m2(2);
+	m1[0][0] = 10;
+
+	m2 = m1;
+
+	EXPECT_EQ(m1, m2);
 }
 
 TEST(TDynamicMatrix, assign_operator_change_matrix_size)
 {
-  ADD_FAILURE();
+	TDynamicMatrix<int> m1(2), m2(4);
+
+	m1 = m2;
+
+	// Проверяем, что размер изменился, через размер строки
+	EXPECT_EQ(4u, m1[0].size());
 }
 
 TEST(TDynamicMatrix, can_assign_matrices_of_different_size)
 {
-  ADD_FAILURE();
+	TDynamicMatrix<int> m1(2), m2(3);
+	m2[0][0] = 7;
+
+	m1 = m2;
+
+	EXPECT_EQ(3u, m1[0].size());
+	EXPECT_EQ(7, m1[0][0]);
 }
 
 TEST(TDynamicMatrix, compare_equal_matrices_return_true)
 {
-  ADD_FAILURE();
+	TDynamicMatrix<int> m1(2), m2(2);
+	m1[0][0] = 5; m2[0][0] = 5;
+
+	EXPECT_TRUE(m1 == m2);
 }
 
 TEST(TDynamicMatrix, compare_matrix_with_itself_return_true)
 {
-  ADD_FAILURE();
+	TDynamicMatrix<int> m(3);
+	EXPECT_TRUE(m == m);
 }
 
 TEST(TDynamicMatrix, matrices_with_different_size_are_not_equal)
 {
-  ADD_FAILURE();
+	TDynamicMatrix<int> m1(2), m2(3);
+	EXPECT_FALSE(m1 == m2);
 }
 
 TEST(TDynamicMatrix, can_add_matrices_with_equal_size)
 {
-  ADD_FAILURE();
+	TDynamicMatrix<int> m1(2), m2(2);
+	m1[0][0] = 1; m1[0][1] = 2;
+	m2[0][0] = 3; m2[0][1] = 4;
+
+	TDynamicMatrix<int> res = m1 + m2;
+
+	EXPECT_EQ(4, res[0][0]);
+	EXPECT_EQ(6, res[0][1]);
 }
 
 TEST(TDynamicMatrix, cant_add_matrices_with_not_equal_size)
 {
-  ADD_FAILURE();
+	TDynamicMatrix<int> m1(2), m2(3);
+	ASSERT_ANY_THROW(m1 + m2);
 }
 
 TEST(TDynamicMatrix, can_subtract_matrices_with_equal_size)
 {
-  ADD_FAILURE();
+	TDynamicMatrix<int> m1(2), m2(2);
+	m1[0][0] = 10; m1[0][1] = 20;
+	m2[0][0] = 3;  m2[0][1] = 4;
+
+	TDynamicMatrix<int> res = m1 - m2;
+
+	EXPECT_EQ(7, res[0][0]);
+	EXPECT_EQ(16, res[0][1]);
 }
 
 TEST(TDynamicMatrix, cant_subtract_matrixes_with_not_equal_size)
 {
-  ADD_FAILURE();
+	TDynamicMatrix<int> m1(2), m2(3);
+	ASSERT_ANY_THROW(m1 - m2);
 }
 
