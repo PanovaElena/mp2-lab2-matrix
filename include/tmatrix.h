@@ -251,14 +251,16 @@ public:
   // матрично-векторные операции
   TDynamicVector<T> operator*(const TDynamicVector<T>& v)
   {
-      if (sz != v.size())
+      // Количество столбцов — это размер строки матрицы
+      if (sz == 0 || pMem[0].size() != v.size())
           throw invalid_argument("Matrix columns count must match vector size");
 
       TDynamicVector<T> res(sz);
       for (size_t i = 0; i < sz; i++)
       {
           T sum = T();
-          for (size_t j = 0; j < sz; j++)
+          size_t columns = pMem[i].size();
+          for (size_t j = 0; j < columns; j++)
           {
               sum += pMem[i][j] * v[j];
           }
@@ -268,45 +270,59 @@ public:
   }
 
   // матрично-матричные операции
+ //Сложение матриц
   TDynamicMatrix operator+(const TDynamicMatrix& m)
   {
       if (sz != m.sz)
           throw invalid_argument("Matrix sizes must be equal for addition");
 
       TDynamicMatrix res(sz);
-      for (size_t i = 0; i < sz; i++)
-      {
-          res.pMem[i] = pMem[i] + m.pMem[i]; // использует оператор+ вектора
+      for (size_t i = 0; i < sz; i++) {
+          for (size_t j = 0; j < sz; j++) {
+              res.pMem[i][j] = pMem[i][j] + m.pMem[i][j];
+          }
       }
       return res;
   }
+
+  //Вычитание матриц
   TDynamicMatrix operator-(const TDynamicMatrix& m)
   {
       if (sz != m.sz)
           throw invalid_argument("Matrix sizes must be equal for subtraction");
 
       TDynamicMatrix res(sz);
-      for (size_t i = 0; i < sz; i++)
-      {
-          res.pMem[i] = pMem[i] - m.pMem[i]; // использует оператор- вектора
+      for (size_t i = 0; i < sz; i++) {
+          for (size_t j = 0; j < sz; j++) {
+              res.pMem[i][j] = pMem[i][j] - m.pMem[i][j];
+          }
       }
       return res;
   }
   TDynamicMatrix operator*(const TDynamicMatrix& m)
   {
-      if (sz != m.sz)
+      if (sz == 0 || m.sz == 0 || pMem[0].size() != m.sz)
           throw invalid_argument("Matrix sizes must match for multiplication");
 
       TDynamicMatrix res(sz);
+      // Настраиваем ширину результирующей матрицы под количество столбцов второй матрицы
+      size_t m_cols = m.pMem[0].size();
       for (size_t i = 0; i < sz; i++)
       {
-          for (size_t j = 0; j < sz; j++)
+          res.pMem[i] = TDynamicVector<T>(m_cols);
+      }
+
+      for (size_t i = 0; i < sz; i++)
+      {
+          for (size_t j = 0; j < m_cols; j++)
           {
-              res.pMem[i][j] = T();
-              for (size_t k = 0; k < sz; k++)
+              T sum = T();
+              size_t K = pMem[i].size();
+              for (size_t k = 0; k < K; k++)
               {
-                  res.pMem[i][j] += pMem[i][k] * m.pMem[k][j];
+                  sum += pMem[i][k] * m.pMem[k][j];
               }
+              res.pMem[i][j] = sum;
           }
       }
       return res;
