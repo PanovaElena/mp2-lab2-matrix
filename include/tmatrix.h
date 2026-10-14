@@ -290,12 +290,12 @@ public:
       TDynamicMatrix res(sz);
       for (size_t i = 0; i < sz; i++)
       {
-          for (size_t j = 0; j < sz; j++)
+          for (size_t j = 0; j < res.pMem[i].size(); j++)
           {
               res.pMem[i][j] = T(); // Инициализация нулем
-              for (size_t k = 0; k < sz; k++)
+              for (size_t k = j; k < pMem[i].size(); k++)
               {
-                  res.pMem[i][j] += pMem[i][k] * m.pMem[k][j];
+                  res.pMem[i][j] += pMem[i][k] * m.pMem[i + k][j - k];
               }
           }
       }
