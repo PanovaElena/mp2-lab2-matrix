@@ -212,7 +212,18 @@ public:
       for (size_t i = 0; i < sz; i++)
           pMem[i] = TDynamicVector<T>(sz);
   }
+  // Конструктор копирования
+  TDynamicMatrix(const TDynamicMatrix& m) : TDynamicVector<TDynamicVector<T>>(m) {}
 
+  // Оператор присваивания
+  TDynamicMatrix& operator=(const TDynamicMatrix& m)
+  {
+      if (this != &m)
+      {
+          TDynamicVector<TDynamicVector<T>>::operator=(m);
+      }
+      return *this;
+  }
   using TDynamicVector<TDynamicVector<T>>::operator[];
 
   // сравнение
