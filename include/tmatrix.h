@@ -32,7 +32,7 @@ class TDynamicVector
   public:
     TDynamicVector(size_t size = 1) : sz(size)
     {
-      if (sz == 0 || sz > MAX_MATRIX_SIZE)
+      if (sz == 0 || sz > MAX_VECTOR_SIZE)
         throw std::out_of_range("Vector size should be greater than zero");
       pMem = new T[sz]();// {}; // У типа T д.б. констуктор по умолчанию
     }
@@ -377,7 +377,7 @@ class TCSRmatrix{
   TCSRmatrix (const TDynamicMatrix<T>& m) : row_count(m.size()), col_count(m.size()), row_ptr(m.size() + 1) //kontructor preobrazovaniya v CSRmatrix
   {
 
-    if (m.size() >= MAX_MATRIX_SIZE || m.size() == 0){ throw std::out_of_range("Size matrice doljni bit' 0 < x <= MAX_MATRIX_SIZE");}
+    if (m.size() > MAX_MATRIX_SIZE || m.size() == 0){ throw std::out_of_range("Size matrice doljni bit' 0 < x <= MAX_MATRIX_SIZE");}
 
     for (size_t i = 0; i < row_count; i++){
       for(size_t j = 0; j < col_count; j++){
@@ -391,8 +391,6 @@ class TCSRmatrix{
       row_ptr[i + 1] = values.size(); // count_not_zero_elem[i] = row_ptr[i + 1] - row_ptr[i]
     }
   }
-
-  TCSRmatrix (const TCSRmatrix<T>& m) = default; // puskai compilyator vseo sam sdelaet:)
   
 
   T at(size_t row, size_t col) const{
@@ -413,6 +411,18 @@ class TCSRmatrix{
     }
 
     return T{}; // if start = end (popalas' nulevaya stroka)
+  }
+
+  bool operator==(const TCSRmatrix& m) const{
+    return row_count == m.row_count &&
+        col_count == m.col_count &&
+        values == m.values &&
+        col_index == m.col_index &&
+        row_ptr == m.row_ptr;
+  }
+
+  bool operator!=(const TCSRmatrix& m) const{
+    return !(*this == m);
   }
 
   size_t get_row() const { return row_count;}
@@ -455,12 +465,6 @@ class TCSRmatrix{
       for (size_t k = row + 1; k < row_count + 1; k++) {row_ptr[k]++; }
     }
   }
-
-  TCSRmatrix operator*(const T& val) const{
-
-    
-  }
-
 
 
 };

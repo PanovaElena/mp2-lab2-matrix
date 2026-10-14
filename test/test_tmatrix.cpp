@@ -293,3 +293,100 @@ TEST(TDynamicMatrix, can_multiply_matrices_with_size_not_divisible_by_block_size
 
   EXPECT_EQ(m1.blockMult(m2), m1 * m2);
 }
+
+TEST(TCSRmatrix, can_create_and_get_dimensions)
+{
+  ASSERT_NO_THROW(TCSRmatrix<int> m1(3, 7));
+  TCSRmatrix<int> m2(3, 7);
+
+  EXPECT_EQ(m2.get_row(), 3);
+  EXPECT_EQ(m2.get_col(), 7);
+  EXPECT_EQ(m2.at(0, 0), 0);
+}
+
+TEST(TCSRmatrix, can_create_from_dynamic_matrix)
+{
+  TDynamicMatrix<int> m1(2);
+  m1[0][0] = 10;
+  m1[1][1] = 40;
+
+  TCSRmatrix<int> m2(m1);
+
+  EXPECT_EQ(m2.at(0, 0), 10);
+  EXPECT_EQ(m2.at(0, 1), 0);
+  EXPECT_EQ(m2.at(1, 0), 0);
+  EXPECT_EQ(m2.at(1, 1), 40);
+}
+
+TEST(TCSRmatrix, can_set_overwrite_and_erase_elements)
+{
+  TCSRmatrix<int> m1(2, 4);
+
+  m1.set(0, 3, 30);
+  m1.set(0, 1, 10);
+  EXPECT_EQ(m1.at(0, 1), 10);
+  EXPECT_EQ(m1.at(0, 3), 30);
+
+  m1.set(0, 1, 99);
+  EXPECT_EQ(m1.at(0, 1), 99);
+
+  m1.set(0, 1, 0);
+  EXPECT_EQ(m1.at(0, 1), 0);
+}
+
+TEST(TCSRmatrix, throws_when_index_out_of_range)
+{
+  TCSRmatrix<int> m1(2, 2);
+
+  ASSERT_ANY_THROW(m1.at(2, 0));
+  ASSERT_ANY_THROW(m1.at(0, 2));
+  ASSERT_ANY_THROW(m1.set(2, 0, 5));
+  ASSERT_ANY_THROW(m1.set(0, 2, 5));
+}
+
+TEST(TCSRmatrix, can_copy_matrix_with_independent_memory)
+{
+  TCSRmatrix<int> m1(2, 2);
+  m1.set(0, 0, 5);
+
+  TCSRmatrix<int> m2(m1);
+  EXPECT_TRUE(m1 == m2);
+
+  m1.set(0, 0, 99);
+  EXPECT_EQ(m1.at(0, 0), 99);
+  EXPECT_EQ(m2.at(0, 0), 5);
+  EXPECT_FALSE(m1 == m2);
+}
+
+TEST(TCSRmatrix, can_assign_matrix_and_change_size)
+{
+  TCSRmatrix<int> m1(2, 3);
+  m1.set(1, 2, 77);
+
+  m1 = m1;
+  EXPECT_EQ(m1.at(1, 2), 77);
+
+  TCSRmatrix<int> m2(5, 5);
+  m2 = m1;
+
+  EXPECT_EQ(m2.get_row(), 2);
+  EXPECT_EQ(m2.get_col(), 3);
+  EXPECT_TRUE(m1 == m2);
+}
+
+TEST(TCSRmatrix, compare_matrices_equality_and_inequality)
+{
+  TCSRmatrix<int> m1(2, 2);
+  TCSRmatrix<int> m2(2, 2);
+  EXPECT_TRUE(m1 == m2);
+
+  m1.set(0, 1, 42);
+  EXPECT_FALSE(m1 == m2);
+  EXPECT_TRUE(m1 != m2);
+
+  m2.set(1, 0, 42);
+  EXPECT_FALSE(m1 == m2);
+
+  TCSRmatrix<int> m3(3, 2);
+  EXPECT_FALSE(m1 == m3);
+}

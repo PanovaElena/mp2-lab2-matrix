@@ -258,4 +258,17 @@ TEST(TDynamicVector, cant_multiply_vectors_with_not_equal_size)
 
   ASSERT_ANY_THROW(v * v1);
 }
+TEST(TDynamicVector, move_constructor_steals_memory_and_nullifies_source)
+{
+  TDynamicVector<int> v1(5);
+  v1[0] = 42;
+  int* original_mem_address = &v1[0];
+
+  TDynamicVector<int> v2(std::move(v1));
+
+  EXPECT_EQ(v2.size(), 5);
+  EXPECT_EQ(v2[0], 42);
+  EXPECT_EQ(&v2[0], original_mem_address);
+  EXPECT_EQ(v1.size(), 0);
+}
 
