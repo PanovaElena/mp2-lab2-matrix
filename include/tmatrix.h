@@ -243,14 +243,13 @@ public:
       if (sz != v.size())
           throw invalid_argument("Matrix columns count must match vector size");
 
-      TDynamicVector<T> res(sz); // Вектор результатов (заполнен нулями)
-
+      TDynamicVector<T> res(sz);
       for (size_t i = 0; i < sz; i++)
       {
           T sum = T();
-          for (size_t j = 0; j < pMem[i].size(); j++)
+          for (size_t j = 0; j < sz; j++)
           {
-              sum += pMem[i][j] * v[i + j];
+              sum += pMem[i][j] * v[j]; 
           }
           res[i] = sum;
       }
@@ -290,12 +289,12 @@ public:
       TDynamicMatrix res(sz);
       for (size_t i = 0; i < sz; i++)
       {
-          for (size_t j = 0; j < res.pMem[i].size(); j++)
+          for (size_t j = 0; j < sz; j++)
           {
-              res.pMem[i][j] = T(); // Инициализация нулем
-              for (size_t k = j; k < pMem[i].size(); k++)
+              res.pMem[i][j] = T();
+              for (size_t k = 0; k < sz; k++)
               {
-                  res.pMem[i][j] += pMem[i][k] * m.pMem[i + k][j - k];
+                  res.pMem[i][j] += pMem[i][k] * m.pMem[k][j]; // Классическое умножение
               }
           }
       }
