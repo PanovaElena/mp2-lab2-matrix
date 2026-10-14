@@ -227,6 +227,9 @@ class TDynamicMatrix : private TDynamicVector<TDynamicVector<T>> //наслед�
   using TDynamicVector<TDynamicVector<T>>::pMem;
   using TDynamicVector<TDynamicVector<T>>::sz;
 public:
+
+  using TDynamicVector<TDynamicVector<T>>::at; // используется для тестов
+
   TDynamicMatrix(size_t s = 1) : TDynamicVector<TDynamicVector<T>>(s)
   {
     if (sz == 0)
@@ -360,6 +363,10 @@ public:
       }
     }
     return res;
+  }
+
+  size_t size() const noexcept {
+    return sz;
   }
 
 };
