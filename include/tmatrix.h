@@ -13,6 +13,11 @@
 #include <cassert>
 #include <vector>
 
+//чтобы скомпилировался на случай отсуствия omp
+#ifdef _OPENMP
+#include <omp.h> 
+#endif
+
 const int MAX_VECTOR_SIZE = 100000000;
 const int MAX_MATRIX_SIZE = 10000;
 
@@ -399,7 +404,7 @@ class TCSRmatrix{
     size_t end = row_ptr[row + 1];
 
     for (size_t j = start; j < end; j++){
-      if (col_index[j] > col){  //v etoi stroke uje ne budet nenulevogo elem, vihodim iz sycle
+      if (col_index[j] > col){  //v etoi stroke uje ne budet nenulevogo elem, vihodim iz cycle
         return T{};
       }
       if (col_index[j] == col){
@@ -420,7 +425,7 @@ class TCSRmatrix{
 
     size_t start = row_ptr[row]; 
     size_t end = row_ptr[row + 1];
-    size_t insertion_index = end;
+    size_t insertion_index = end; //если строка фулл нули, то цикл работать не будет, поэтому сразу запоминаем
 
     for (size_t j = start; j < end; j++){
       
@@ -437,8 +442,8 @@ class TCSRmatrix{
          
          return;
       }
-      if (col_index[j] > col){
-        insertion_index = j;
+      if (col_index[j] > col){ // столбцы в рамках одной строки упорядоченны, если такое условие выполняется - значит искать нечего - наш элемент 0
+        insertion_index = j; 
         break;
       }
     }
@@ -460,19 +465,22 @@ class TCSRmatrix{
 
 };
 
-// blochnoe umnojenie
 
+
+
+// blochnoe umnojenie
 template <typename T>
 TDynamicMatrix<T> TDynamicMatrix<T>::blockMult(const TDynamicMatrix<T>& m) const{
 
-  if (m.size != sz) { throw std::out_of_range("Matrici doljni bit' odinakovogo razmera");}
-
+  if (m.sz != sz) { throw std::out_of_range("Matrici doljni bit' odinakovogo razmera");}
+  // testirovat' smisl est' dlya bol'shih matric
+  // мы не знаем, какого размера эменты типа T, но предположим, что они <= 8 байт 
   size_t blockSize = 64; // razmer bloka = 64 * 64 * 8 = 32 kilobytes => pomeschaetsya v bistryi caсhe kernel
   TDynamicMatrix<T> tmp(sz);
 
-  #pragma omp parallel for //razbivaem po yadram
+  #pragma omp parallel for //rasparallelivanie cycle's
   for (size_t i_0 = 0; i_0 < sz; i_0 += blockSize){
-    size_t i_max = (sz < i_0 + blockSize) ? sz : i_0 + blockSize;
+    size_t i_max = (sz < i_0 + blockSize) ? sz : i_0 + blockSize; //granica bloka po kajdome indeksu
 
     for (size_t k_0 = 0; k_0 < sz; k_0 += blockSize){
       size_t k_max = (sz < k_0 + blockSize) ? sz : k_0 + blockSize;
@@ -487,8 +495,8 @@ TDynamicMatrix<T> TDynamicMatrix<T>::blockMult(const TDynamicMatrix<T>& m) const
 
             T temp = pMem[i][k];
 
+            #pragma omp simd       //prosim kompilyator vectorizovat' cycle (esli on sam etogo ne sdelaet)
             for (size_t j = j_0; j < j_max; j++){
-
               tmp[i][j] += temp * m[k][j];
             }
           }
