@@ -249,7 +249,7 @@ public:
           T sum = T();
           for (size_t j = 0; j < sz; j++)
           {
-              sum += pMem[i][j] * v[j]; 
+              sum += pMem[i][j] * v[j];
           }
           res[i] = sum;
       }
@@ -294,7 +294,7 @@ public:
               res.pMem[i][j] = T();
               for (size_t k = 0; k < sz; k++)
               {
-                  res.pMem[i][j] += pMem[i][k] * m.pMem[k][j]; // Классическое умножение
+                  res.pMem[i][j] += pMem[i][k] * m.pMem[k][j];
               }
           }
       }
