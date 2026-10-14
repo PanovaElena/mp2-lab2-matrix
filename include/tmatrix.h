@@ -50,7 +50,7 @@ public:
     pMem = new T[sz];
     std::copy(v.pMem, v.pMem + sz, pMem);
   }
-  TDynamicVector(TDynamicVector&& v) noexcept // noexcept - чтобы во время перемещения при ошибкене было такого, что старая память уже удалилась, а новая не смогла переместиться из-за исключения
+  TDynamicVector(TDynamicVector&& v) noexcept // noexcept - чтобы во время перемещения при ошибке не было такого, что старая память уже удалилась, а новая не смогла переместиться из-за исключения
   {
     sz = v.sz;
     pMem = v.pMem;
@@ -325,6 +325,33 @@ public:
     }
     return ostr;
   }
+
+  TDynamicMatrix blockMultiply (const TDynamicMatrix& m) {
+    if (sz != m.sz) {
+      throw out_of_range("Matrix size mismatch");
+    }
+    TDynamicMatrix res(sz);
+    size_t blocksize = 48;
+    for (size_t ii = 0; ii < sz; ii += blocksize) {
+      size_t iEnd = min(sz, ii + blocksize);
+      for (size_t kk = 0; kk < sz; kk += blocksize) {
+        size_t kEnd = min(kk + blocksize, sz);
+        for (size_t jj = 0; jj < sz; jj += blocksize) {
+          size_t jEnd = min(sz, jj + blocksize);
+
+          for (size_t i = ii; i < iEnd; i++) {
+            for (size_t k = kk; k < kEnd; k++) {
+              for (size_t j = jj; j < jEnd; j++) {
+                res[i][j] += pMem[i][k] * m[k][j];
+              }
+            }
+          }
+        }
+      }
+    }
+    return res;
+  }
+
 };
 
 #endif
