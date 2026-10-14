@@ -12,7 +12,7 @@
 #include <cassert>
 #include <algorithm>
 
-#ifdef _OPENMP
+#ifdef _OPENMP // Если в компиляторе включена поддержка OpenMP, подключаем библиотеку для многопоточности
 #include <omp.h>
 #endif
 
