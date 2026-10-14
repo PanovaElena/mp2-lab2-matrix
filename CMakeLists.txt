@@ -9,6 +9,8 @@ project(${PROJECT_NAME})
 include(CTest)
 enable_testing()  # defines BUILD_TESTING
 
+find_package(OpenMP REQUIRED)
+
 set(MP2_TESTS   "test_${PROJECT_NAME}")
 set(MP2_CUSTOM_PROJECT "${PROJECT_NAME}")
 set(MP2_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include")
@@ -24,6 +26,9 @@ if(BUILD_TESTING)
 	add_subdirectory(test)
 endif()
 
+if(TARGET ${PROJECT_NAME})
+	target_link_libraries(${PROJECT_NAME} INTERFACE OpenMP::OpenMP_CXX)
+endif()
 
 # REPORT
 message( STATUS "")
