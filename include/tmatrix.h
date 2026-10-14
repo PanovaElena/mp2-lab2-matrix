@@ -292,6 +292,24 @@ public:
 
     return tmp;
   }
+  TDynamicMatrix badMult(const TDynamicMatrix& m) const
+  {
+    if (sz != m.sz){
+      throw std::out_of_range("Matrici doljni bit' odinakovoi razmernosti");
+    }
+
+    TDynamicMatrix<T> tmp(sz);
+
+    for (size_t i = 0; i < sz; i++){
+      for (size_t j = 0; j < sz; j++){        
+        for (size_t k = 0; k < sz; k++){   
+          tmp[i][j] += pMem[i][k] * m[k][j];
+        }
+      }
+    }
+    return tmp;
+  }
+
   TDynamicMatrix operator*(const TDynamicMatrix& m) const
   {
     if (sz != m.sz){
@@ -302,13 +320,16 @@ public:
 
     for (size_t i = 0; i < sz; i++){
       for (size_t k = 0; k < sz; k++){ // resultat takoi je, zato vsegda na odnoi stroke nahodimsya,
+        T temp = pMem[i][k];            // chtobi lishniy raz v pamyat' ne obraschatsya
         for (size_t j = 0; j < sz; j++){   // po pamyaty ne prigaem, gladko idem!!
-          tmp[i][j] += pMem[i][k] * m[k][j];
+          tmp[i][j] += temp * m[k][j];
         }
       }
     }
     return tmp;
   }
+   
+  TDynamicMatrix<T> blockMult(const TDynamicMatrix<T>& m) const;
 
   // ввод/вывод
   friend std::istream& operator>>(std::istream& istr, TDynamicMatrix& v)
@@ -439,4 +460,42 @@ class TCSRmatrix{
 
 };
 
+// blochnoe umnojenie
+
+template <typename T>
+TDynamicMatrix<T> TDynamicMatrix<T>::blockMult(const TDynamicMatrix<T>& m) const{
+
+  if (m.size != sz) { throw std::out_of_range("Matrici doljni bit' odinakovogo razmera");}
+
+  size_t blockSize = 64; // razmer bloka = 64 * 64 * 8 = 32 kilobytes => pomeschaetsya v bistryi caсhe kernel
+  TDynamicMatrix<T> tmp(sz);
+
+  #pragma omp parallel for //razbivaem po yadram
+  for (size_t i_0 = 0; i_0 < sz; i_0 += blockSize){
+    size_t i_max = (sz < i_0 + blockSize) ? sz : i_0 + blockSize;
+
+    for (size_t k_0 = 0; k_0 < sz; k_0 += blockSize){
+      size_t k_max = (sz < k_0 + blockSize) ? sz : k_0 + blockSize;
+
+      for (size_t j_0 = 0; j_0 < sz; j_0 += blockSize){
+        size_t j_max = (sz < j_0 + blockSize) ? sz : j_0 + blockSize;
+
+        // umnojaem v granicah bloka
+        for (size_t i = i_0; i < i_max; i++){
+
+          for (size_t k = k_0; k < k_max; k++){
+
+            T temp = pMem[i][k];
+
+            for (size_t j = j_0; j < j_max; j++){
+
+              tmp[i][j] += temp * m[k][j];
+            }
+          }
+        }
+      }
+    }
+  }
+  return tmp;
+}
 #endif
