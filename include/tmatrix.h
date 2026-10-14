@@ -243,10 +243,16 @@ public:
       if (sz != v.size())
           throw invalid_argument("Matrix columns count must match vector size");
 
-      TDynamicVector<T> res(sz);
+      TDynamicVector<T> res(sz); // Вектор результатов (заполнен нулями)
+
       for (size_t i = 0; i < sz; i++)
       {
-          res[i] = pMem[i] * v; // использует скалярное произведение (оператор* вектора)
+          T sum = T();
+          for (size_t j = 0; j < pMem[i].size(); j++)
+          {
+              sum += pMem[i][j] * v[i + j];
+          }
+          res[i] = sum;
       }
       return res;
   }
