@@ -300,9 +300,11 @@ public:
       throw out_of_range("Vector size mismatch");
     }
     TDynamicMatrix res(sz);
+#pragma omp parallel for schedule(dynamic) // делим строки между потоками
     for (size_t i = 0; i < sz; i++) {
       for (size_t k = 0; k < sz; k++) {
         for (size_t j = 0; j < sz; j++) {
+#pragma omp simd //Внутри потока включаем векторизацию, перед циклом т.к. обрабатываем сразу несколько итераций в одной процессорной инструкции
           res[i][j] += pMem[i][k] * m[k][j];
         }
       }
@@ -332,6 +334,7 @@ public:
     }
     TDynamicMatrix res(sz);
     size_t blocksize = 48;
+#pragma omp parallel for schedule(dynamic) // делим блоки между потоками
     for (size_t ii = 0; ii < sz; ii += blocksize) {
       size_t iEnd = min(sz, ii + blocksize);
       for (size_t kk = 0; kk < sz; kk += blocksize) {
@@ -341,6 +344,7 @@ public:
 
           for (size_t i = ii; i < iEnd; i++) {
             for (size_t k = kk; k < kEnd; k++) {
+#pragma omp simd
               for (size_t j = jj; j < jEnd; j++) {
                 res[i][j] += pMem[i][k] * m[k][j];
               }
