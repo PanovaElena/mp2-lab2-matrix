@@ -18,6 +18,10 @@ if(BUILD_SAMPLES)
 	add_subdirectory(samples)
 endif()
 
+if (MSVC)
+    add_compile_definitions(GTEST_LANG_CXX11=1)
+endif()
+
 if(BUILD_TESTING)
     add_subdirectory(gtest)
 	add_subdirectory(test)
