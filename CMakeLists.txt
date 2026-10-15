@@ -5,6 +5,10 @@ option(BUILD_SAMPLES ON)
 set(PROJECT_NAME matrix)
 project(${PROJECT_NAME})
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 include(CTest)
 enable_testing()  # defines BUILD_TESTING
 
@@ -15,18 +19,13 @@ set(MP2_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 add_subdirectory(include)
 
 if(BUILD_SAMPLES)
-	add_subdirectory(samples)
-endif()
-
-if (MSVC)
-    add_compile_definitions(GTEST_LANG_CXX11=1)
+    add_subdirectory(samples)
 endif()
 
 if(BUILD_TESTING)
     add_subdirectory(gtest)
-	add_subdirectory(test)
+    add_subdirectory(test)
 endif()
-
 
 # REPORT
 message( STATUS "")

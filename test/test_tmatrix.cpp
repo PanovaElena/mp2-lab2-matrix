@@ -1,6 +1,6 @@
 #include "tmatrix.h"
 #include <chrono>
-#include <gtest.h>
+#include <gtest/gtest.h>
 
 TEST(TDynamicMatrix, can_create_matrix_with_positive_length)
 {
@@ -210,7 +210,7 @@ TEST(TDynamicMatrix, cannot_multiple_matrixes_with_different_size_even_by_second
 	TDynamicMatrix<int>m1(3);
 	EXPECT_ANY_THROW(m.mult2(m1));
 }
-/*TEST(TDynamicMatrix, cycles_replacing_make_multiple_faster) {
+TEST(TDynamicMatrix, cycles_replacing_make_multiple_faster) {
 	TDynamicMatrix<double>m(1000);
 	for (size_t i = 0; i < 1000; i++) {
 		for (size_t j = 0; j < 1000; j++) {
@@ -245,5 +245,5 @@ TEST(TDynamicMatrix, cannot_multiple_matrixes_with_different_size_even_by_second
 	std::cout << "Standart multiple: " << res.count() << "\n" << "Time by cycles replacing: " << res2.count() << "\n";
 	double diff = res / res2;
 	EXPECT_GE(diff, 1.5);
-}*/
+}
 
