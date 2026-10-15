@@ -246,10 +246,38 @@ TEST(TDynamicMatrix, can_multiply_matrices_with_equal_size)
   EXPECT_EQ(50, result[1][1]);
 }
 
-TEST(TDynamicMatrix, canе_multiply_matrices_with_different_size) {
+TEST(TDynamicMatrix, cant_multiply_matrices_with_different_size) {
   TDynamicMatrix<int> a(2), b(1);
 
   EXPECT_THROW(a*b, out_of_range);
 }
 
+TEST(TDynamicMatrix, blocked_multiply_gives_same_result_as_usual) {
+  const size_t n = 100;
+  TDynamicMatrix<int> a(n), b(n);
 
+  for (size_t i = 0; i < n; i++)
+    for (size_t j = 0; j < n; j++) {
+      a[i][j] = (i + j) % 7;      // небольшие числа, чтобы избежать переполнения int
+      b[i][j] = (i * j + 1) % 5;
+    }
+
+  TDynamicMatrix<int> usual = a * b; // сравниваем обычным умножением, т.к. оно уже корректно
+  TDynamicMatrix<int> blocked = a.blockMultiply(b);
+
+  EXPECT_EQ(usual, blocked);
+}
+
+TEST(TDynamicMatrix, blocked_multiply_cant_multiply_matrices_with_different_sizes) {
+  int n = 50;
+  int m = 60;
+  TDynamicMatrix<int> a(n), b(m);
+
+  for (size_t i = 0; i < n; i++)
+    for (size_t j = 0; j < n; j++) {
+      a[i][j] = (i + j) % 7;      // небольшие числа, чтобы избежать переполнения int
+      b[i][j] = (i * j + 1) % 5;
+    }
+
+  EXPECT_THROW(a.blockMultiply(b), out_of_range);
+}
