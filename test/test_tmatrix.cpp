@@ -97,7 +97,7 @@ TEST(TDynamicMatrix, can_assign_matrices_of_equal_size)
 TEST(TDynamicMatrix, assign_operator_change_matrix_size)
 {
   TDynamicMatrix<int> m(2);
-  TDynamicMatrix<int> m1(4)ж
+  TDynamicMatrix<int> m1(4);
   m = m1;
   EXPECT_EQ(4, m.size());
 }
