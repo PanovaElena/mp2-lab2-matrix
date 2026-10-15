@@ -9,7 +9,7 @@ project(${PROJECT_NAME})
 include(CTest)
 enable_testing()  # defines BUILD_TESTING
 
-find_package(OpenMP REQUIRED)
+find_package(OpenMP)
 
 set(MP2_TESTS   "test_${PROJECT_NAME}")
 set(MP2_CUSTOM_PROJECT "${PROJECT_NAME}")
