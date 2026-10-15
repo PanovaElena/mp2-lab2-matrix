@@ -126,14 +126,14 @@ public:
           res.pMem[i] = pMem[i] + val;
       return res;
   }
-  TDynamicVector operator-(double val)
+  TDynamicVector operator-(T val)
   {
       TDynamicVector res(sz);
       for (size_t i = 0; i < sz; ++i)
           res.pMem[i] = pMem[i] - val;
       return res;
   }
-  TDynamicVector operator*(double val)
+  TDynamicVector operator*(T val)
   {
       TDynamicVector res(sz);
       for (size_t i = 0; i < sz; ++i)
@@ -238,7 +238,7 @@ public:
   }
 
   // матрично-скалярные операции
-  TDynamicVector<T> operator*(const T& val)
+  TDynamicVector<TDynamicVector<T>> operator*(const T& val)
   {
       TDynamicMatrix res(sz);
       for (size_t i = 0; i < sz; i++)
@@ -249,7 +249,7 @@ public:
   }
 
   // матрично-векторные операции
-  TDynamicVector<T> operator*(const TDynamicVector<T>& v)
+  TDynamicVector<TDynamicVector<T>> operator*(const TDynamicVector<T>& v)
   {
       // Количество столбцов — это размер строки матрицы
       if (sz == 0 || pMem[0].size() != v.size())
