@@ -5,6 +5,8 @@ option(BUILD_SAMPLES ON)
 set(PROJECT_NAME matrix)
 project(${PROJECT_NAME})
 
+add_compile_definitions(GTEST_HAS_TR1_TUPLE=0 GTEST_USE_OWN_TR1_TUPLE=0)
+
 include(CTest)
 enable_testing()  # defines BUILD_TESTING
 

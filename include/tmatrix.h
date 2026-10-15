@@ -251,7 +251,7 @@ public:
   // матрично-векторные операции
   TDynamicVector<TDynamicVector<T>> operator*(const TDynamicVector<T>& v)
   {
-      // Количество столбцов — это размер строки матрицы
+      // Количество столбцов - это размер строки матрицы
       if (sz == 0 || pMem[0].size() != v.size())
           throw invalid_argument("Matrix columns count must match vector size");
 
