@@ -333,14 +333,14 @@ public:
   friend istream& operator>>(istream& istr, TDynamicMatrix& v)
   {
       for (size_t i = 0; i < v.sz; i++) {
-          istr >> m.pMem[i];
+          istr >> v.pMem[i];
       }
       return(istr);
   }
   friend ostream& operator<<(ostream& ostr, const TDynamicMatrix& v)
   {
       for (size_t i = 0; i < v.sz; i++) {
-          ostr << v[i] << "/n";
+          ostr << v[i] <<'\n';
       }
       return(ostr);
   }
