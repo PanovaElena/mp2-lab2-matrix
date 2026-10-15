@@ -240,10 +240,10 @@ public:
   // матрично-скалярные операции
   TDynamicVector<TDynamicVector<T>> operator*(const T& val)
   {
-      TDynamicMatrix res(sz);
+      TDynamicVector<TDynamicVector<T>> res(sz); // Создаем вектор векторов
       for (size_t i = 0; i < sz; i++)
       {
-          res.pMem[i] = pMem[i] * val; // использует оператор* вектора
+          res[i] = pMem[i] * val;
       }
       return res;
   }
