@@ -26,86 +26,258 @@ TEST(TDynamicMatrix, can_create_copied_matrix)
 
 TEST(TDynamicMatrix, copied_matrix_is_equal_to_source_one)
 {
-  ADD_FAILURE();
+  TDynamicMatrix<int> m1(3);
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      m1[i][j] = i * j;
+    }
+  }
+  TDynamicMatrix<int> m2(m1);
+
+  EXPECT_EQ(m1, m2);
+
 }
 
-TEST(TDynamicMatrix, copied_matrix_has_its_own_memory)
-{
-  ADD_FAILURE();
+TEST(TDynamicMatrix, copied_matrix_has_its_own_memory) {
+  TDynamicMatrix<int> m1(3);
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      m1[i][j] = i * j;
+    }
+  }
+  TDynamicMatrix<int> m2(m1);
+  m2[0][0] = 999;
+
+  EXPECT_NE(m1[0][0], m2[0][0]);
 }
 
 TEST(TDynamicMatrix, can_get_size)
 {
-  ADD_FAILURE();
+  TDynamicMatrix<int> m1(3);
+  ASSERT_NO_THROW(m1[0].size());
 }
 
 TEST(TDynamicMatrix, can_set_and_get_element)
 {
-  ADD_FAILURE();
+  TDynamicMatrix<int> m1(3);
+
+  m1[0][0] = 999;
+
+  EXPECT_EQ(m1[0][0], 999);
 }
 
 TEST(TDynamicMatrix, throws_when_set_element_with_negative_index)
 {
-  ADD_FAILURE();
+  TDynamicMatrix<int> m1(3);
+
+  EXPECT_THROW(m1.at(-1).at(-2), out_of_range);
+
 }
 
 TEST(TDynamicMatrix, throws_when_set_element_with_too_large_index)
 {
-  ADD_FAILURE();
+  TDynamicMatrix<int> m1(3);
+
+  EXPECT_THROW(m1.at(MAX_MATRIX_SIZE+1).at(MAX_MATRIX_SIZE+1), out_of_range);
+
 }
 
 TEST(TDynamicMatrix, can_assign_matrix_to_itself)
 {
-  ADD_FAILURE();
+  TDynamicMatrix<int> m1(3);
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      m1[i][j] = i * j;
+    }
+  }
+  m1 = m1;
+  EXPECT_EQ(m1[0][0], 0);
+  EXPECT_EQ(m1[2][2], 4);
 }
 
 TEST(TDynamicMatrix, can_assign_matrices_of_equal_size)
 {
-  ADD_FAILURE();
+  TDynamicMatrix<int> m1(3);
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      m1[i][j] = i * j;
+    }
+  }
+  TDynamicMatrix<int> m2(3);
+  m2 = m1;
+  EXPECT_EQ(m2,m1);
 }
 
 TEST(TDynamicMatrix, assign_operator_change_matrix_size)
 {
-  ADD_FAILURE();
+  TDynamicMatrix<int> m1(3);
+  TDynamicMatrix<int> m2(4);
+
+  m2 = m1;
+
+  EXPECT_EQ(m1.size(), m2.size());
+
 }
 
 TEST(TDynamicMatrix, can_assign_matrices_of_different_size)
 {
-  ADD_FAILURE();
+  TDynamicMatrix<int> m1(3);
+  TDynamicMatrix<int> m2(4);
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      m2[i][j] = i * j;
+    }
+  }
+
+  m2 = m1;
+
+  EXPECT_EQ(m1, m2);
 }
 
 TEST(TDynamicMatrix, compare_equal_matrices_return_true)
 {
-  ADD_FAILURE();
+  TDynamicMatrix<int> m1(3);
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      m1[i][j] = i * j;
+    }
+  }
+  TDynamicMatrix<int> m2(3);
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      m2[i][j] = i * j;
+    }
+  }
+
+  EXPECT_TRUE(m2 == m1);
 }
 
 TEST(TDynamicMatrix, compare_matrix_with_itself_return_true)
 {
-  ADD_FAILURE();
+  TDynamicMatrix<int> m1(3);
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      m1[i][j] = i * j;
+    }
+  }
+
+  EXPECT_TRUE(m1 == m1);
 }
 
 TEST(TDynamicMatrix, matrices_with_different_size_are_not_equal)
 {
-  ADD_FAILURE();
+  TDynamicMatrix<int> m1(3);
+  TDynamicMatrix<int> m2(4);
+
+  EXPECT_FALSE(m1 == m2);
 }
 
 TEST(TDynamicMatrix, can_add_matrices_with_equal_size)
 {
-  ADD_FAILURE();
+  TDynamicMatrix<int> m1(2), m2(2);
+  for (size_t i = 0; i < 2; i++)
+    for (size_t j = 0; j < 2; j++) {
+      m1[i][j] = i + j;
+      m2[i][j] = 1;
+    }
+
+  TDynamicMatrix<int> result = m1 + m2;
+
+  EXPECT_EQ(1, result[0][0]);
+  EXPECT_EQ(2, result[0][1]);
+  EXPECT_EQ(2, result[1][0]);
+  EXPECT_EQ(3, result[1][1]);
 }
 
 TEST(TDynamicMatrix, cant_add_matrices_with_not_equal_size)
 {
-  ADD_FAILURE();
+  TDynamicMatrix<int> m1(2), m2(1);
+  for (size_t i = 0; i < 2; i++)
+    for (size_t j = 0; j < 2; j++) {
+      m1[i][j] = i + j;
+    }
+  m2[0][0] = 1;
+
+  EXPECT_THROW(m1 + m2, out_of_range);
 }
 
 TEST(TDynamicMatrix, can_subtract_matrices_with_equal_size)
 {
-  ADD_FAILURE();
+  TDynamicMatrix<int> m1(2), m2(2);
+  for (size_t i = 0; i < 2; i++)
+    for (size_t j = 0; j < 2; j++) {
+      m1[i][j] = i + j;
+      m2[i][j] = 1;
+    }
+
+  TDynamicMatrix<int> result = m1 - m2;
+
+  EXPECT_EQ(-1, result[0][0]);
+  EXPECT_EQ(0, result[0][1]);
+  EXPECT_EQ(0, result[1][0]);
+  EXPECT_EQ(1, result[1][1]);
 }
 
-TEST(TDynamicMatrix, cant_subtract_matrixes_with_not_equal_size)
+TEST(TDynamicMatrix, cant_subtract_matrixes_with_not_equal_size) {
+  TDynamicMatrix<int> m1(2), m2(1);
+  for (size_t i = 0; i < 2; i++)
+    for (size_t j = 0; j < 2; j++) {
+      m1[i][j] = i + j;
+    }
+  m2[0][0] = 1;
+
+  EXPECT_THROW(m1 - m2, out_of_range);
+}
+
+TEST(TDynamicMatrix, can_multiply_matrices_with_equal_size)
 {
-  ADD_FAILURE();
+  TDynamicMatrix<int> a(2), b(2);
+  a[0][0] = 1; a[0][1] = 2;
+  a[1][0] = 3; a[1][1] = 4;
+
+  b[0][0] = 5; b[0][1] = 6;
+  b[1][0] = 7; b[1][1] = 8;
+
+  TDynamicMatrix<int> result = a * b;
+
+  EXPECT_EQ(19, result[0][0]);
+  EXPECT_EQ(22, result[0][1]);
+  EXPECT_EQ(43, result[1][0]);
+  EXPECT_EQ(50, result[1][1]);
 }
 
+TEST(TDynamicMatrix, cant_multiply_matrices_with_different_size) {
+  TDynamicMatrix<int> a(2), b(1);
+
+  EXPECT_THROW(a*b, out_of_range);
+}
+
+TEST(TDynamicMatrix, blocked_multiply_gives_same_result_as_usual) {
+  const size_t n = 100;
+  TDynamicMatrix<int> a(n), b(n);
+
+  for (size_t i = 0; i < n; i++)
+    for (size_t j = 0; j < n; j++) {
+      a[i][j] = (i + j) % 7;      // небольшие числа, чтобы избежать переполнения int
+      b[i][j] = (i * j + 1) % 5;
+    }
+
+  TDynamicMatrix<int> usual = a * b; // сравниваем обычным умножением, т.к. оно уже корректно
+  TDynamicMatrix<int> blocked = a.blockMultiply(b);
+
+  EXPECT_EQ(usual, blocked);
+}
+
+TEST(TDynamicMatrix, blocked_multiply_cant_multiply_matrices_with_different_sizes) {
+  int n = 50;
+  int m = 60;
+  TDynamicMatrix<int> a(n), b(m);
+
+  for (size_t i = 0; i < n; i++)
+    for (size_t j = 0; j < n; j++) {
+      a[i][j] = (i + j) % 7;      // небольшие числа, чтобы избежать переполнения int
+      b[i][j] = (i * j + 1) % 5;
+    }
+
+  EXPECT_THROW(a.blockMultiply(b), out_of_range);
+}

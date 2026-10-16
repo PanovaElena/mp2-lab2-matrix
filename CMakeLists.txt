@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(BUILD_SAMPLES ON)
 
@@ -7,6 +8,8 @@ project(${PROJECT_NAME})
 
 include(CTest)
 enable_testing()  # defines BUILD_TESTING
+
+find_package(OpenMP)
 
 set(MP2_TESTS   "test_${PROJECT_NAME}")
 set(MP2_CUSTOM_PROJECT "${PROJECT_NAME}")
@@ -23,6 +26,9 @@ if(BUILD_TESTING)
 	add_subdirectory(test)
 endif()
 
+if(TARGET ${PROJECT_NAME})
+	target_link_libraries(${PROJECT_NAME} INTERFACE OpenMP::OpenMP_CXX)
+endif()
 
 # REPORT
 message( STATUS "")
