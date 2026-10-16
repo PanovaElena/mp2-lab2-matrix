@@ -369,6 +369,23 @@ public:
     return sz;
   }
 
+  TDynamicMatrix slowMultiply(const TDynamicMatrix& m)
+  {
+    if (sz != m.sz) {
+      throw out_of_range("Vector size mismatch");
+    }
+    TDynamicMatrix res(sz);
+    for (size_t i = 0; i < sz; i++) {
+      for (size_t j = 0; j < sz; j++) {
+        T sum = T();
+        for (size_t k = 0; k < sz; k++) {
+          sum += pMem[i][k] * m[k][j];
+        }
+        res[i][j] = sum;
+      }
+    }
+    return res;
+  }
 };
 
 #endif

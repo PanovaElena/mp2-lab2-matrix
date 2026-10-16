@@ -55,7 +55,15 @@ int main()
   auto time1 = std::chrono::duration_cast<std::chrono::milliseconds>(end1 - start1).count();
   auto time2 = std::chrono::duration_cast<std::chrono::milliseconds>(end2 - start2).count();
 
+  auto start3 = std::chrono::high_resolution_clock::now();
+  TDynamicMatrix<int> res3 = M1.slowMultiply(M2);
+  auto end3 = std::chrono::high_resolution_clock::now();
+  auto time3 = std::chrono::duration_cast<std::chrono::milliseconds>(end3 - start3).count();
+
+  cout << "Наивное (i,j,k) умножение: " << time3 << " мс" << endl;
+
   cout << "Размер матрицы: " << N << endl;
+  cout << "Медленное умножение: " << time3 << " мс" << endl;
   cout << "Обычное умножение: " << time1 << " мс" << endl;
   //cout << "Блочное без OpenMP:  " << time2 << " мс" << endl;
   cout << "Блочное + OpenMP:  " << time2 << " мс" << endl;
