@@ -11,7 +11,7 @@
 #include <cassert>
 #include <algorithm>
 
-using namespace std;
+//using namespace std;
 
 const int MAX_VECTOR_SIZE = 100000000;
 const int MAX_MATRIX_SIZE = 10000;
@@ -28,9 +28,9 @@ public:
   TDynamicVector(size_t size = 1) : sz(size)
   {
     if (sz == 0)
-      throw out_of_range("Vector size should be greater than zero");
+      throw std::out_of_range("Vector size should be greater than zero");
     if (sz > MAX_VECTOR_SIZE)
-      throw length_error("Vector size is too large");
+      throw std::length_error("Vector size is too large");
     pMem = new T[sz]();// {}; // У типа T д.б. констуктор по умолчанию
   }
   TDynamicVector(T* arr, size_t s) : sz(s)
@@ -90,12 +90,12 @@ public:
   // индексация с контролем
   T& at(size_t ind)
   {
-    if (ind >= sz) throw out_of_range("Index out of range");
+    if (ind >= sz) throw std::out_of_range("Index out of range");
     return pMem[ind];
   }
   const T& at(size_t ind) const
   {
-    if (ind >= sz) throw out_of_range("Index out of range");
+    if (ind >= sz) throw std::out_of_range("Index out of range");
     return pMem[ind];
   }
 
@@ -136,21 +136,21 @@ public:
   // векторные операции
   TDynamicVector operator+(const TDynamicVector& v)
   {
-    if (sz != v.sz) throw invalid_argument("Vectors must be the same size");
+    if (sz != v.sz) throw std::invalid_argument("Vectors must be the same size");
     TDynamicVector temp(sz);
     for (size_t i =0; i < sz; i++) temp.pMem[i] = pMem[i] + v.pMem[i];
     return temp;
   }
   TDynamicVector operator-(const TDynamicVector& v)
   {
-    if (sz != v.sz) throw invalid_argument("Vectors must be the same size");
+    if (sz != v.sz) throw std::invalid_argument("Vectors must be the same size");
     TDynamicVector temp(sz);
     for (size_t i =0; i < sz; i++) temp.pMem[i] = pMem[i] - v.pMem[i];
     return temp;
   }
-  T operator*(const TDynamicVector& v) noexcept(noexcept(T()))
+  T operator*(const TDynamicVector& v) 
   {
-    if (sz != v.sz) throw invalid_argument("Vectors must be the same size");
+    if (sz != v.sz) throw std::invalid_argument("Vectors must be the same size");
     T res = T();
     for (size_t i =0; i < sz; i++) res += pMem[i] * v.pMem[i];
     return res;
@@ -163,13 +163,13 @@ public:
   }
 
   // ввод/вывод
-  friend istream& operator>>(istream& istr, TDynamicVector& v)
+  friend std::istream& operator>>(std::istream& istr, TDynamicVector& v)
   {
     for (size_t i = 0; i < v.sz; i++)
       istr >> v.pMem[i]; // требуется оператор>> для типа T
     return istr;
   }
-  friend ostream& operator<<(ostream& ostr, const TDynamicVector& v)
+  friend std::ostream& operator<<(std::ostream& ostr, const TDynamicVector& v)
   {
     for (size_t i = 0; i < v.sz; i++)
       ostr << v.pMem[i] << ' '; // требуется оператор<< для типа T
@@ -189,7 +189,7 @@ public:
   TDynamicMatrix(size_t s = 1) : TDynamicVector<TDynamicVector<T>>(s)
   {
     if (sz > MAX_MATRIX_SIZE)
-      throw out_of_range("Matrix size is too large");
+      throw std::out_of_range("Matrix size is too large");
     for (size_t i = 0; i < sz; i++)
       pMem[i] = TDynamicVector<T>(sz);
   }
@@ -223,7 +223,7 @@ public:
   // матрично-векторные операции
   TDynamicVector<T> operator*(const TDynamicVector<T>& v)
   {
-    if (sz != v.size()) throw invalid_argument("Matrix and vector sizes not same");
+    if (sz != v.size()) throw std::invalid_argument("Matrix and vector sizes not same");
     TDynamicVector<T> temp(sz);
     for (size_t i = 0; i < sz ; i++) {
       temp[i] = pMem[i] * v;
@@ -234,7 +234,7 @@ public:
   // матрично-матричные операции
   TDynamicMatrix operator+(const TDynamicMatrix& m)
   {
-    if (sz != m.size()) throw invalid_argument("Matrices must be the same size");
+    if (sz != m.size()) throw std::invalid_argument("Matrices must be the same size");
     TDynamicMatrix<T> temp(sz);
     for (size_t i = 0; i < sz ; i++) {
       temp.pMem[i] = pMem[i] + m.pMem[i];
@@ -243,7 +243,7 @@ public:
   }
   TDynamicMatrix operator-(const TDynamicMatrix& m)
   {
-    if (sz != m.size()) throw invalid_argument("Matrices must be the same size");
+    if (sz != m.size()) throw std::invalid_argument("Matrices must be the same size");
     TDynamicMatrix<T> temp(sz);
     for (size_t i = 0; i < sz ; i++) {
       temp.pMem[i] = pMem[i] - m.pMem[i];
@@ -252,7 +252,7 @@ public:
   }
   // TDynamicMatrix operator*(const TDynamicMatrix& m)
   // {
-  //   if (sz != m.size()) throw invalid_argument("Matrices must be the same size");
+  //   if (sz != m.size()) throw std::invalid_argument("Matrices must be the same size");
   //   TDynamicMatrix<T> temp(sz);
   //   for (size_t i = 0; i < sz ; i++) {
   //     for (size_t j = 0; j < sz; j++) {
@@ -267,7 +267,7 @@ public:
 
   TDynamicMatrix operator*(const TDynamicMatrix& m)
   {
-    if (sz != m.sz) throw invalid_argument("Matrices must be the same size");
+    if (sz != m.sz) throw std::invalid_argument("Matrices must be the same size");
     TDynamicMatrix temp(sz); 
     
     int n = static_cast<int>(sz);
@@ -304,17 +304,17 @@ public:
   }
 
   // ввод/вывод
-  friend istream& operator>>(istream& istr, TDynamicMatrix& v)
+  friend std::istream& operator>>(std::istream& istr, TDynamicMatrix& v)
   {
     for (size_t i = 0; i < v.sz ; i++) {
       istr >> v.pMem[i];
     }
     return istr;
   }
-  friend ostream& operator<<(ostream& ostr, const TDynamicMatrix& v)
+  friend std::ostream& operator<<(std::ostream& ostr, const TDynamicMatrix& v)
   {
     for (size_t i = 0; i < v.sz ; i++) {
-      ostr << v.pMem[i] << endl;
+      ostr << v.pMem[i] << std::endl;
     }
     return ostr;
   }
@@ -394,7 +394,7 @@ public:
         TDynamicVector<T> result(n_size);
 
         #pragma omp parallel for
-        for (size_t i = 0; i < n_size; i++) {
+        for (int i = 0; i < static_cast<int>(n_size); i++) {
             T sum = T();
             
             for (size_t j = rows[i]; j < rows[i+1]; j++) { // сокращаем время, идем от ровс[i] До ровс[i+1]
