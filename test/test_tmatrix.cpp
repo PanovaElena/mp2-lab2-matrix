@@ -264,3 +264,66 @@ TEST(SparseMatrix, can_multiply_crs_matrix_by_vector)
 
   EXPECT_EQ(sm * v, expected);
 }
+
+TEST(SparseMatrix, can_multiply_by_scalar)
+{
+  TDynamicMatrix<int> m(2);
+  m[0][0] = 2; m[1][1] = 3;
+  SparseMatrix<int> sm(m);
+  
+  SparseMatrix<int> res = sm * 5;
+  std::vector<int> expected_data = {10, 15};
+  EXPECT_EQ(res.getData(), expected_data);
+}
+
+TEST(SparseMatrix, can_add_matrices)
+{
+  TDynamicMatrix<int> m1(2), m2(2);
+  m1[0][0] = 1; m1[0][1] = 2;
+  m2[0][1] = 3; m2[1][1] = 4;
+  
+  SparseMatrix<int> sm1(m1), sm2(m2);
+  SparseMatrix<int> res = sm1 + sm2;
+  
+  std::vector<int> expected_data = {1, 5, 4}; // 1 на (0,0), 2+3=5 на (0,1), 4 на (1,1)
+  std::vector<size_t> expected_cols = {0, 1, 1};
+  std::vector<size_t> expected_rows = {0, 2, 3};
+  
+  EXPECT_EQ(res.getData(), expected_data);
+  EXPECT_EQ(res.getCols(), expected_cols);
+  EXPECT_EQ(res.getRows(), expected_rows);
+}
+
+TEST(SparseMatrix, can_subtract_matrices)
+{
+  TDynamicMatrix<int> m1(2), m2(2);
+  m1[0][0] = 5; m1[0][1] = 2;
+  m2[0][0] = 3; m2[1][1] = 4;
+  
+  SparseMatrix<int> sm1(m1), sm2(m2);
+  SparseMatrix<int> res = sm1 - sm2;
+  
+  std::vector<int> expected_data = {2, 2, -4};
+  EXPECT_EQ(res.getData(), expected_data);
+}
+
+TEST(SparseMatrix, can_multiply_matrices)
+{
+  TDynamicMatrix<int> m1(2), m2(2);
+
+  m1[0][0] = 1; m1[0][1] = 2; m1[1][1] = 3;
+  
+  m2[0][0] = 2; 
+  m2[1][0] = 1; m2[1][1] = 4;
+  
+  SparseMatrix<int> sm1(m1), sm2(m2);
+  SparseMatrix<int> res = sm1 * sm2;
+  
+  std::vector<int> expected_data = {4, 8, 3, 12};
+  std::vector<size_t> expected_cols = {0, 1, 0, 1};
+  std::vector<size_t> expected_rows = {0, 2, 4};
+  
+  EXPECT_EQ(res.getData(), expected_data);
+  EXPECT_EQ(res.getCols(), expected_cols);
+  EXPECT_EQ(res.getRows(), expected_rows);
+}

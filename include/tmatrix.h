@@ -331,6 +331,9 @@ private:
     size_t n_size;
 
 public:
+    SparseMatrix(size_t size = 1) : n_size(size) {
+        rows.assign(n_size + 1, 0); 
+    }
     SparseMatrix(const TDynamicMatrix<T>& plotMatrix) {
         n_size = plotMatrix.size();
         
@@ -339,14 +342,48 @@ public:
         for (size_t i = 0; i < n_size; i++) {
             int non_zero_count = 0;
             for (size_t j = 0; j < n_size; j++) {
-                if (plotMatrix[i][j] != T()) { 
+                if (plotMatrix[i][j] != T()) { // Если элемент не 0, сохраняем значение, столбец, считаем нужные эл-ты
                     data.push_back(plotMatrix[i][j]);
                     cols.push_back(j);
                     non_zero_count++;
                 }
             }
-            rows.push_back(rows.back() + non_zero_count);
+            rows.push_back(rows.back() + non_zero_count); // сколько эл-тов != 0
         }
+    }
+
+    size_t size() const noexcept { return n_size; }
+
+    // чтение по индексу
+    T at(size_t i, size_t j) const { 
+        if (i >= n_size || j >= n_size) throw std::out_of_range("Index out of range");
+        
+        for (size_t k = rows[i]; k < rows[i+1]; k++) {
+            if (cols[k] == j) {
+                return data[k]; 
+            }
+        }
+        return T(); 
+    }
+
+    bool operator==(const SparseMatrix& m) const noexcept {
+        return n_size == m.n_size && data == m.data && cols == m.cols && rows == m.rows;
+    }
+    bool operator!=(const SparseMatrix& m) const noexcept {
+        return !(*this == m);
+    }
+
+    SparseMatrix operator*(const T& val) const {
+        SparseMatrix res(n_size);
+        if (val == T()) return res; // умн на 0
+
+        res.data = data;
+        res.cols = cols;
+        res.rows = rows;
+        for (size_t i = 0; i < res.data.size(); i++) {
+            res.data[i] = res.data[i] * val;
+        }
+        return res;
     }
 
     TDynamicVector<T> operator*(const TDynamicVector<T>& v) const {
@@ -357,15 +394,126 @@ public:
         TDynamicVector<T> result(n_size);
 
         #pragma omp parallel for
-        for (int i = 0; i < static_cast<int>(n_size); i++) {
+        for (size_t i = 0; i < n_size; i++) {
             T sum = T();
             
-            for (size_t j = rows[i]; j < rows[i+1]; j++) {
+            for (size_t j = rows[i]; j < rows[i+1]; j++) { // сокращаем время, идем от ровс[i] До ровс[i+1]
                 sum += data[j] * v[cols[j]];
             }
             result[i] = sum;
         }
         return result;
+    }
+
+    SparseMatrix operator+(const SparseMatrix& m) const {
+        if (n_size != m.n_size) throw std::invalid_argument("Sizes must match");
+        SparseMatrix res(n_size);
+        
+        for (size_t i = 0; i < n_size; i++) {
+            size_t ptr1 = rows[i], end1 = rows[i+1]; // начало и конец i строки
+            size_t ptr2 = m.rows[i], end2 = m.rows[i+1];
+
+            // Слияние двух отсортированных строк
+            while (ptr1 < end1 && ptr2 < end2) {
+                if (cols[ptr1] < m.cols[ptr2]) {
+                    res.data.push_back(data[ptr1]);
+                    res.cols.push_back(cols[ptr1]);
+                    ptr1++;
+                } else if (cols[ptr1] > m.cols[ptr2]) {
+                    res.data.push_back(m.data[ptr2]);
+                    res.cols.push_back(m.cols[ptr2]);
+                    ptr2++;
+                } else {
+                    T sum = data[ptr1] + m.data[ptr2];
+                    if (sum != T()) {
+                        res.data.push_back(sum);
+                        res.cols.push_back(cols[ptr1]);
+                    }
+                    ptr1++; ptr2++;
+                }
+            }
+            // Если вторая строка закончилась раньше первой, дописываем остаток и наоборот
+            while (ptr1 < end1) { res.data.push_back(data[ptr1]); res.cols.push_back(cols[ptr1++]); }
+            while (ptr2 < end2) { res.data.push_back(m.data[ptr2]); res.cols.push_back(m.cols[ptr2++]); }
+            
+            res.rows[i+1] = res.data.size();
+        }
+        return res;
+    }
+
+    SparseMatrix operator-(const SparseMatrix& m) const {
+        if (n_size != m.n_size) throw std::invalid_argument("Sizes must match");
+        SparseMatrix res(n_size);
+        
+        for (size_t i = 0; i < n_size; i++) {
+            size_t ptr1 = rows[i], end1 = rows[i+1];
+            size_t ptr2 = m.rows[i], end2 = m.rows[i+1];
+
+            while (ptr1 < end1 && ptr2 < end2) {
+                if (cols[ptr1] < m.cols[ptr2]) {
+                    res.data.push_back(data[ptr1]);
+                    res.cols.push_back(cols[ptr1]);
+                    ptr1++;
+                } else if (cols[ptr1] > m.cols[ptr2]) {
+                    res.data.push_back(-m.data[ptr2]); // отриц
+                    res.cols.push_back(m.cols[ptr2]);
+                    ptr2++;
+                } else {
+                    T diff = data[ptr1] - m.data[ptr2];
+                    if (diff != T()) {
+                        res.data.push_back(diff);
+                        res.cols.push_back(cols[ptr1]);
+                    }
+                    ptr1++; ptr2++;
+                }
+            }
+            while (ptr1 < end1) { res.data.push_back(data[ptr1]); res.cols.push_back(cols[ptr1++]); }
+            while (ptr2 < end2) { res.data.push_back(-m.data[ptr2]); res.cols.push_back(m.cols[ptr2++]); }
+            
+            res.rows[i+1] = res.data.size();
+        }
+        return res;
+    }
+
+    SparseMatrix operator*(const SparseMatrix& m) const {
+        if (n_size != m.n_size) throw std::invalid_argument("Sizes must match");
+        SparseMatrix res(n_size);
+        
+        std::vector<T> temp_row(n_size, T());
+        std::vector<size_t> marker(n_size, n_size);
+
+        for (size_t i = 0; i < n_size; i++) {
+            std::vector<size_t> non_zero_cols; // где не 0
+
+            for (size_t j = rows[i]; j < rows[i+1]; j++) { // перебираем эл-ты != 0
+                size_t col_A = cols[j]; // эл-т, стоящий в столбце col_A первой матрицы, должен умножаться на всю строку col_A второй матрицы
+                T val_A = data[j];
+
+                for (size_t k = m.rows[col_A]; k < m.rows[col_A+1]; k++) { // перебираем эл-ты 2-ой матрицы != 0
+                    size_t col_B = m.cols[k];
+                    T val_B = m.data[k];
+
+                    if (marker[col_B] != (i)) { // берем впервые
+                        marker[col_B] = (i);
+                        temp_row[col_B] = val_A * val_B;
+                        non_zero_cols.push_back(col_B);
+                    } else {
+                        temp_row[col_B] += val_A * val_B; // копим сумму
+                    }
+                }
+            }
+
+            std::sort(non_zero_cols.begin(), non_zero_cols.end());
+            for (size_t col : non_zero_cols) {
+                if (temp_row[col] != T()) {
+                    res.data.push_back(temp_row[col]);
+                    res.cols.push_back(col);
+                }
+                temp_row[col] = T(); // Очищаем для следующей строки
+            }
+            res.rows[i+1] = res.data.size();
+        }
+        return res;
     }
     
     const std::vector<T>& getData() const { return data; }
