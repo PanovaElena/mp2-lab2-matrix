@@ -8,6 +8,7 @@
 #define __TDynamicMatrix_H__
 
 #include <iostream>
+#include <algorithm>
 
 //using namespace std;
 
@@ -193,47 +194,143 @@ class TDynamicMatrix : private TDynamicVector<TDynamicVector<T>>
 {
   using TDynamicVector<TDynamicVector<T>>::pMem;
   using TDynamicVector<TDynamicVector<T>>::sz;
+  TDynamicMatrix(const TDynamicVector<TDynamicVector<T>>& v): TDynamicVector<TDynamicVector<T>>(v) {}//для сложения в 1 строку
+  static size_t cheksz(size_t s) { //бросит искл до выделения памяти
+      if (s > MAX_MATRIX_SIZE)
+          throw std::length_error("The matrix exceeds the maximum size");
+      return s;
+  }
 public:
-  TDynamicMatrix(size_t s = 1) : TDynamicVector<TDynamicVector<T>>(s)
+  TDynamicMatrix(size_t s = 1) : TDynamicVector<TDynamicVector<T>>(cheksz(s))
   {
     for (size_t i = 0; i < sz; i++)
       pMem[i] = TDynamicVector<T>(sz);
   }
 
   using TDynamicVector<TDynamicVector<T>>::operator[];
+  using TDynamicVector<TDynamicVector<T>>::size;
+  using TDynamicVector<TDynamicVector<T>>::at;
 
   // сравнение
   bool operator==(const TDynamicMatrix& m) const noexcept
   {
+      if (sz != m.sz) return false;
+      for (size_t i = 0; i < sz; i++) {
+          if (pMem[i] != m.pMem[i]) return false;
+      }
+      return true;
+  }
+  bool operator!=(const TDynamicMatrix& m) const noexcept //либо забыли, либо не нужен был,но дописал
+  {
+      return !(*this == m);
   }
 
   // матрично-скалярные операции
-  TDynamicVector<T> operator*(const T& val)
+  TDynamicMatrix operator*(const T& val) const
   {
+      TDynamicMatrix res(sz);
+      for (size_t i = 0; i < sz; i++)
+          res.pMem[i] = pMem[i] * val;
+      return res;
   }
 
   // матрично-векторные операции
-  TDynamicVector<T> operator*(const TDynamicVector<T>& v)
+  TDynamicVector<T> operator*(const TDynamicVector<T>& v) const
   {
+      if(sz != v.size()) throw std::invalid_argument("The vector and matrix sizes do not match");
+      TDynamicVector<T> res(sz);
+      for (size_t i = 0; i < sz; i++)
+          res[i] = pMem[i] * v;
+      return res;
   }
 
   // матрично-матричные операции
   TDynamicMatrix operator+(const TDynamicMatrix& m)
-  {
+  {// нужен приватный конструктор(Vector<Vector> -> Matrix)
+      return TDynamicMatrix(TDynamicVector<TDynamicVector<T>>::operator+(m));
   }
   TDynamicMatrix operator-(const TDynamicMatrix& m)
   {
+      return TDynamicMatrix(TDynamicVector<TDynamicVector<T>>::operator-(m));
   }
-  TDynamicMatrix operator*(const TDynamicMatrix& m)
+
+  // для сравнения скорости напишем 4 версии умножения*:
+  TDynamicMatrix multiply_slow(const TDynamicMatrix& m) const// прыжки по памяти
   {
+      if (sz != m.sz)
+          throw std::invalid_argument("matrix sizes do not match");
+      TDynamicMatrix res(sz);
+      for (size_t i = 0; i < sz; i++) {
+          for (size_t j = 0; j < sz; j++) {
+              for (size_t k = 0; k < sz; k++)
+                  res.pMem[i][j] += pMem[i][k] * m.pMem[k][j];
+          }
+      }
+      return res;
+  }
+  TDynamicMatrix multipy_fast(const TDynamicMatrix& m) const//последовательно по строке
+  {
+      if (sz != m.sz)
+          throw std::invalid_argument("matrix sizes do not match");
+      TDynamicMatrix res(sz);
+      for (size_t i = 0; i < sz; i++) {
+          for (size_t k = 0; k < sz; k++) {
+              for (size_t j = 0; j < sz; j++)
+                  res.pMem[i][j] += pMem[i][k] * m.pMem[k][j];
+          }
+      }
+      return res;
+  }
+  TDynamicMatrix multipy_blocked(const TDynamicMatrix& m, size_t block = 64) const//умножать блоками
+  {
+      if (sz != m.sz)
+          throw std::invalid_argument("matrix sizes do not match");
+      TDynamicMatrix res(sz);
+      for (size_t i2 = 0; i2 < sz; i2 += block)//цикл по блокам строк
+          for (size_t k2 = 0; k2 < sz; k2 += block)//цикл по блокам столбцов A/строк B
+              for (size_t j2 = 0; j2 < sz; j2 += block)//цикл по блокам столбцов результата
+                  for (size_t i = i2; i < std::min(i2 + block, sz); i++)
+                      for (size_t k = k2; k < std::min(k2 + block, sz); k++)
+                          for (size_t j = j2; j < std::min(j2 + block, sz); j++)
+                              res.pMem[i][j] += pMem[i][k] * m.pMem[k][j];
+
+      return res;
+  }//в итоге данные разбиения помещаются в быструю память, в следствии чего реже обращаемся к медленной
+  TDynamicMatrix multipy_omp(const TDynamicMatrix& m) const
+  {
+      if (sz != m.sz)
+          throw std::invalid_argument("matrix sizes do not match");
+      TDynamicMatrix res(sz);
+      #pragma omp parallel for
+      for (long long i = 0; i < (long long)sz; i++)//OpenMP требует знаковый счётчик
+          for (size_t k = 0; k < sz; k++)
+              for (size_t j = 0; j < sz; j++)
+                  res.pMem[(size_t)i][j] += pMem[(size_t)i][k] * m.pMem[k][j];
+      return res;
+  }
+
+
+  TDynamicMatrix operator*(const TDynamicMatrix& m) const
+  {
+      return multipy_fast(m);//безопасное и быстрое 
   }
 
   // ввод/вывод
   friend std::istream& operator>>(std::istream& istr, TDynamicMatrix& v)
   {
+      for (size_t i = 0; i < sz; i++)
+          for (size_t j = 0; j < sz; j++)
+              istr >> v.pMem[i][j];
+      return istr;
   }
   friend std::ostream& operator<<(std::ostream& ostr, const TDynamicMatrix& v)
   {
+      for (size_t i = 0; i < sz; i++) {
+          for (size_t j = 0; j < sz; j++)
+              ostr << v.pMem[i][j] << ' ';
+          ostr << '\n';
+      }
+      return ostr;
   }
 };
 
