@@ -109,3 +109,12 @@ TEST(TDynamicMatrix, cant_subtract_matrixes_with_not_equal_size)
   ADD_FAILURE();
 }
 
+TEST(TDynamicMatrix, can_read_matrix)
+{
+  ADD_FAILURE();
+}
+
+TEST(TDynamicMatrix, can_write_matrix)
+{
+  ADD_FAILURE();
+}

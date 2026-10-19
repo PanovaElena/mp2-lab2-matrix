@@ -1,6 +1,6 @@
+#include <sstream>
+#include "gtest.h"
 #include "tmatrix.h"
-
-#include <gtest.h>
 
 TEST(TDynamicVector, can_create_vector_with_positive_length)
 {
@@ -22,6 +22,16 @@ TEST(TDynamicVector, can_create_copied_vector)
   TDynamicVector<int> v(10);
 
   ASSERT_NO_THROW(TDynamicVector<int> v1(v));
+}
+
+TEST(TDynamicVector, can_move_vector_using_move_constructor)
+{
+  ADD_FAILURE();
+}
+
+TEST(TDynamicVector, can_move_vector_using_move_operator)
+{
+  ADD_FAILURE();
 }
 
 TEST(TDynamicVector, copied_vector_is_equal_to_source_one)
@@ -139,3 +149,27 @@ TEST(TDynamicVector, cant_multiply_vectors_with_not_equal_size)
   ADD_FAILURE();
 }
 
+TEST(TDynamicVector, can_read_vector)
+{
+  TDynamicVector<int> v(5);
+  TDynamicVector<int> expected(5);
+  for (int i = 0; i < 5; i++) expected[i] = i;
+  
+  std::stringstream sstr;
+  sstr << "1 2 3 4 5\n";
+  sstr >> v;
+  
+  EXPECT_EQ(expected, v);
+}
+
+TEST(TDynamicVector, can_write_vector)
+{
+  TDynamicVector<int> v;
+  for (int i = 0; i < 5; i++) v[i] = i;
+  std::string expected = "1 2 3 4 5 ";
+  
+  std::stringstream sstr;
+  sstr << v;
+  
+  EXPECT_EQ(expected, sstr.str());
+}
