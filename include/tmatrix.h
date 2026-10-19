@@ -9,8 +9,6 @@
 
 #include <iostream>
 
-using namespace std;
-
 const int MAX_VECTOR_SIZE = 100000000;
 const int MAX_MATRIX_SIZE = 10000;
 
@@ -26,7 +24,7 @@ public:
   TDynamicVector(size_t size = 1) : sz(size)
   {
     if (sz == 0)
-      throw out_of_range("Vector size should be greater than zero");
+      throw std::out_of_range("Vector size should be greater than zero");
     pMem = new T[sz]();// {}; // У типа T д.б. констуктор по умолчанию
   }
   TDynamicVector(T* arr, size_t s) : sz(s)
@@ -46,10 +44,11 @@ public:
   }
   TDynamicVector& operator=(const TDynamicVector& v)
   {
+    return *this;
   }
   TDynamicVector& operator=(TDynamicVector&& v) noexcept
   {
-      return *this;
+    return *this;
   }
 
   size_t size() const noexcept { return sz; }
@@ -57,46 +56,62 @@ public:
   // индексация
   T& operator[](size_t ind)
   {
+    throw "Not implemented";
+    return pMem[0];
   }
   const T& operator[](size_t ind) const
   {
+    throw "Not implemented";
+    return pMem[0];
   }
   // индексация с контролем
   T& at(size_t ind)
   {
+    throw "Not implemented";
+    return pMem[0];
   }
   const T& at(size_t ind) const
   {
+    throw "Not implemented";
+    return pMem[0];
   }
 
   // сравнение
   bool operator==(const TDynamicVector& v) const noexcept
   {
+    return false;
   }
   bool operator!=(const TDynamicVector& v) const noexcept
   {
+    return false;
   }
 
   // скалярные операции
   TDynamicVector operator+(T val)
   {
+    return TDynamicVector{};
   }
   TDynamicVector operator-(double val)
   {
+    return TDynamicVector{};
   }
   TDynamicVector operator*(double val)
   {
+    return TDynamicVector{};
   }
 
   // векторные операции
   TDynamicVector operator+(const TDynamicVector& v)
   {
+    return TDynamicVector{};
   }
   TDynamicVector operator-(const TDynamicVector& v)
   {
+    return TDynamicVector{};
   }
-  T operator*(const TDynamicVector& v) noexcept(noexcept(T()))
+  T operator*(const TDynamicVector& v) //noexcept(noexcept(T()))
   {
+    return T{};
   }
 
   friend void swap(TDynamicVector& lhs, TDynamicVector& rhs) noexcept
@@ -106,13 +121,13 @@ public:
   }
 
   // ввод/вывод
-  friend istream& operator>>(istream& istr, TDynamicVector& v)
+  friend std::istream& operator>>(std::istream& istr, TDynamicVector& v)
   {
     for (size_t i = 0; i < v.sz; i++)
       istr >> v.pMem[i]; // требуется оператор>> для типа T
     return istr;
   }
-  friend ostream& operator<<(ostream& ostr, const TDynamicVector& v)
+  friend std::ostream& operator<<(std::ostream& ostr, const TDynamicVector& v)
   {
     for (size_t i = 0; i < v.sz; i++)
       ostr << v.pMem[i] << ' '; // требуется оператор<< для типа T
@@ -140,35 +155,44 @@ public:
   // сравнение
   bool operator==(const TDynamicMatrix& m) const noexcept
   {
+    return false;
   }
 
   // матрично-скалярные операции
-  TDynamicVector<T> operator*(const T& val)
+  TDynamicMatrix<T> operator*(const T& val)
   {
+    return TDynamicMatrix<T>{};
   }
 
   // матрично-векторные операции
   TDynamicVector<T> operator*(const TDynamicVector<T>& v)
   {
+    return TDynamicVector<T>{};
   }
 
   // матрично-матричные операции
   TDynamicMatrix operator+(const TDynamicMatrix& m)
   {
+    // можно ли написать реализацию, используя operator+ вектора?
+    return TDynamicMatrix<T>{};
   }
   TDynamicMatrix operator-(const TDynamicMatrix& m)
   {
+    return TDynamicMatrix<T>{};
   }
   TDynamicMatrix operator*(const TDynamicMatrix& m)
   {
+    return TDynamicMatrix<T>{};
   }
 
   // ввод/вывод
-  friend istream& operator>>(istream& istr, TDynamicMatrix& v)
+  friend std::istream& operator>>(std::istream& istr, TDynamicMatrix& v)
   {
+    return istr;
   }
-  friend ostream& operator<<(ostream& ostr, const TDynamicMatrix& v)
+  friend std::ostream& operator<<(std::ostream& ostr, const TDynamicMatrix& v)
   {
+    return ostr;
   }
 };
 
