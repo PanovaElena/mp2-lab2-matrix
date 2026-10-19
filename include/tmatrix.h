@@ -255,7 +255,7 @@ public:
   }
 
   // для сравнения скорости напишем 4 версии умножения*:
-  TDynamicMatrix multiply_slow(const TDynamicMatrix& m) const// прыжки по памяти
+  TDynamicMatrix multipy_slow(const TDynamicMatrix& m) const// прыжки по памяти
   {
       if (sz != m.sz)
           throw std::invalid_argument("matrix sizes do not match");
@@ -275,8 +275,9 @@ public:
       TDynamicMatrix res(sz);
       for (size_t i = 0; i < sz; i++) {
           for (size_t k = 0; k < sz; k++) {
+              T a = pMem[i][k]; //каждый раз лезет в память из-за чего убивает всю скорость-оптимизацию кэша
               for (size_t j = 0; j < sz; j++)
-                  res.pMem[i][j] += pMem[i][k] * m.pMem[k][j];
+                  res.pMem[i][j] += a * m.pMem[k][j];
           }
       }
       return res;
@@ -290,10 +291,13 @@ public:
           for (size_t k2 = 0; k2 < sz; k2 += block)//цикл по блокам столбцов A/строк B
               for (size_t j2 = 0; j2 < sz; j2 += block)//цикл по блокам столбцов результата
                   for (size_t i = i2; i < std::min(i2 + block, sz); i++)
-                      for (size_t k = k2; k < std::min(k2 + block, sz); k++)
-                          for (size_t j = j2; j < std::min(j2 + block, sz); j++)
-                              res.pMem[i][j] += pMem[i][k] * m.pMem[k][j];
-
+                      for (size_t j = j2; j < std::min(j2 + block, sz); j++) {
+                          T sum = T{}; // накапливаем сумму в регистре
+                          for (size_t k = k2; k < std::min(k2 + block, sz); k++)
+                              sum += pMem[i][k] * m.pMem[k][j];
+                          res.pMem[i][j] += sum;
+                      }
+      //ускорение, так как прыжки по столбцу происходят внутри быстрой памяти, засчёт ограничения размером блока
       return res;
   }//в итоге данные разбиения помещаются в быструю память, в следствии чего реже обращаемся к медленной
   TDynamicMatrix multipy_omp(const TDynamicMatrix& m) const
@@ -302,10 +306,14 @@ public:
           throw std::invalid_argument("matrix sizes do not match");
       TDynamicMatrix res(sz);
       #pragma omp parallel for
-      for (long long i = 0; i < (long long)sz; i++)//OpenMP требует знаковый счётчик
-          for (size_t k = 0; k < sz; k++)
+      for (long long i2 = 0; i2 < (long long)sz; i2++) {//OpenMP требует знаковый счётчик
+          size_t i = (size_t)i2; // убрали повторение
+          for (size_t k = 0; k < sz; k++) {
+              T a = pMem[i][k];
               for (size_t j = 0; j < sz; j++)
-                  res.pMem[(size_t)i][j] += pMem[(size_t)i][k] * m.pMem[k][j];
+                  res.pMem[i][j] += a * m.pMem[k][j];
+          }
+      }
       return res;
   }
 
