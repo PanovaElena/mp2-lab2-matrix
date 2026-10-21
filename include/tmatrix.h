@@ -322,7 +322,7 @@ public:
     }
 
     TDynamicMatrix<T> tmp(sz);
-
+    
     for (size_t i = 0; i < sz; i++){
       for (size_t k = 0; k < sz; k++){ // resultat takoi je, zato vsegda na odnoi stroke nahodimsya,
         T temp = pMem[i][k];            // chtobi lishniy raz v pamyat' ne obraschatsya
@@ -372,7 +372,11 @@ class TCSRmatrix{
   
   public:
 
-  TCSRmatrix (size_t row = 1, size_t col = 1) : row_count(row), col_count(col), row_ptr(row + 1) {}
+  TCSRmatrix (size_t row = 1, size_t col = 1) : row_count(row), col_count(col), row_ptr(row + 1) {
+    if (row == 0 || col == 0 || row > MAX_MATRIX_SIZE || col > MAX_MATRIX_SIZE) {
+      throw std::out_of_range("Matrica doljna bit' < 10000");
+    }
+  }
 
   TCSRmatrix (const TDynamicMatrix<T>& m) : row_count(m.size()), col_count(m.size()), row_ptr(m.size() + 1) //kontructor preobrazovaniya v CSRmatrix
   {
@@ -465,8 +469,163 @@ class TCSRmatrix{
       for (size_t k = row + 1; k < row_count + 1; k++) {row_ptr[k]++; }
     }
   }
+  TCSRmatrix operator+(const TCSRmatrix<T>& m) const{
 
+    if (row_count != m.row_count || col_count != m.col_count){
+      throw std::out_of_range("Matrici doljni bit' odinakovoi razmernosti");
+    }
 
+    TCSRmatrix<T> tmp(row_count, col_count);
+
+    size_t start_this, end_this, start_m, end_m, min_end;
+    for (size_t i = 0; i < row_count; i++){ //идем по строкам
+
+      start_this = row_ptr[i]; end_this = row_ptr[i + 1]; // указаьели на начало/конец i-ой строки по столбцам
+      start_m = m.row_ptr[i]; end_m = m.row_ptr[i + 1];
+
+      //пользуемся, что в рамках одной строки индексы столбцов упорядоченны по овзрастанию
+      while (start_this < end_this && start_m < end_m){ //пока у кого-то не закончится строка
+
+          if (col_index[start_this] > m.col_index[start_m]){ 
+
+            tmp.col_index.push_back(m.col_index[start_m]);
+            tmp.values.push_back(m.values[start_m]);
+
+            start_m++;
+          }
+
+          else if (m.col_index[start_m] > col_index[start_this]){
+
+            tmp.col_index.push_back(col_index[start_this]);
+            tmp.values.push_back(values[start_this]);
+
+            start_this++;
+          }
+
+          else{
+            
+            T temp = values[start_this] + m.values[start_m];
+
+            if (temp != T {}){
+
+              tmp.col_index.push_back(col_index[start_this]);
+              tmp.values.push_back(temp);
+
+            }
+            start_m++;
+            start_this++;
+          }
+      }
+    }
+  }
+  TCSRmatrix operator-(const TCSRmatrix<T>& m) const{
+
+    if (row_count != m.row_count || col_count != m.col_count){
+      throw std::out_of_range("Matrici doljni bit' odinakovoi razmernosti");
+    }
+
+    TCSRmatrix<T> tmp(row_count, col_count);
+
+    size_t start_this, end_this, start_m, end_m, min_end;
+    for (size_t i = 0; i < row_count; i++){ //идем по строкам
+
+      start_this = row_ptr[i]; end_this = row_ptr[i + 1]; // указаьели на начало/конец i-ой строки по столбцам
+      start_m = m.row_ptr[i]; end_m = m.row_ptr[i + 1];
+
+      //пользуемся, что в рамках одной строки индексы столбцов упорядоченны по овзрастанию
+      while (start_this < end_this && start_m < end_m){ //пока у кого-то не закончится строка
+
+          if (col_index[start_this] > m.col_index[start_m]){ 
+
+            tmp.col_index.push_back(m.col_index[start_m]);
+            tmp.values.push_back(m.values[start_m]);
+
+            start_m++;
+          }
+
+          else if (m.col_index[start_m] > col_index[start_this]){
+
+            tmp.col_index.push_back(col_index[start_this]);
+            tmp.values.push_back(values[start_this]);
+
+            start_this++;
+          }
+
+          else{
+            
+            T temp = values[start_this] - m.values[start_m];
+
+            if (temp != T {}){
+
+              tmp.col_index.push_back(col_index[start_this]);
+              tmp.values.push_back(temp);
+
+            }
+            start_m++;
+            start_this++;
+          }
+      }
+
+      //остатки, всегда будет работать один из циклов 
+      while (start_this < end_this){
+        tmp.col_index.push_back(col_index[start_this]);
+        tmp.values.push_back(values[start_this]);
+
+        start_this++;
+      }
+
+      while (start_m < end_m){
+        tmp.col_index.push_back(m.col_index[start_m]);
+        tmp.values.push_back(m.values[start_m]);
+
+        start_m++;
+      }
+
+      tmp.row_ptr[i + 1] = tmp.values.size(); 
+    }
+
+    return tmp;
+  }
+  TCSRmatrix operator*(const T& val) const{
+
+    if (val != T{}){
+
+      TCSRmatrix<T> tmp(*this);
+
+      for (size_t i = 0; i < values.size(); i++){ tmp.values[i] = values[i] * val;}
+      return tmp;
+    }
+
+    else{
+      
+      TCSRmatrix<T> tmp1(row_count, col_count);
+      return tmp1;
+    }
+  }
+
+  TDynamicVector<T> operator*(const TDynamicVector<T>& v) const
+  {
+    if (col_count != v.size()) {
+      throw std::out_of_range("doljni bit' ravni razmeri");
+    }
+
+    TDynamicVector<T> tmp(row_count);
+
+    for (size_t i = 0; i < row_count; i++) {
+
+      T temp{};
+      size_t start = row_ptr[i];
+      size_t end = row_ptr[i + 1];
+
+      for (size_t k = start; k < end; k++) {
+        temp += values[k] * v[col_index[k]];
+      }
+
+      tmp[i] = temp;
+    }
+
+    return tmp;
+  }
 };
 
 
