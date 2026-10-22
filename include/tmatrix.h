@@ -11,6 +11,7 @@
 #include <stdexcept>
 #include <cassert>
 #include <algorithm>
+#include <vector>
 
 #ifdef _OPENMP // Если в компиляторе включена поддержка OpenMP, подключаем библиотеку для многопоточности
 #include <omp.h>
@@ -268,7 +269,7 @@ public:
   // матрично-векторные операции
   TDynamicVector<T> operator*(const TDynamicVector<T>& v)
   {
-    if (sz != v.sz) {
+    if (sz != v.size()) {
     throw out_of_range("Vector size mismatch");
   }
     TDynamicVector<T> res(sz);
@@ -337,7 +338,7 @@ public:
     return ostr;
   }
 
-  TDynamicMatrix blockMultiply (const TDynamicMatrix& m) {
+  TDynamicMatrix blockMultiply (const TDynamicMatrix& m) const {
     if (sz != m.sz) {
       throw out_of_range("Matrix size mismatch");
     }
@@ -369,7 +370,7 @@ public:
     return sz;
   }
 
-  TDynamicMatrix slowMultiply(const TDynamicMatrix& m)
+  TDynamicMatrix slowMultiply(const TDynamicMatrix& m) const
   {
     if (sz != m.sz) {
       throw out_of_range("Vector size mismatch");
@@ -386,6 +387,211 @@ public:
     }
     return res;
   }
+};
+
+
+// класс разряженных матриц crs
+template <typename T>
+class SparseMatrix {
+  vector<T>   data;
+  vector<int> rows;   // n + 1 чисел: с какого места в data начинается каждая строка
+  vector<int> cols;
+  size_t n;           // строки
+  size_t m;           // столбцы
+
+public:
+  //default
+  SparseMatrix(size_t rowsCount = 1, size_t colsCount = 1) : rows(rowsCount + 1, 0), n(rowsCount), m(colsCount)
+  {
+    if (n == 0 || m == 0)
+      throw out_of_range("Matrix size should be greater than zero");
+    if (n > MAX_MATRIX_SIZE || m > MAX_MATRIX_SIZE)
+      throw out_of_range("Matrix size is greater than MAX_MATRIX_SIZE = 10000");
+  }
+
+  //приведения типов
+  SparseMatrix(const TDynamicMatrix<T>& a) : rows(1, 0), n(a.size()), m(a.size())
+  {
+    for (size_t i = 0; i < n; i++) {
+      for (size_t j = 0; j < m; j++) {
+        if (a[i][j] != T()) {
+          data.push_back(a[i][j]);
+          cols.push_back(j);
+        }
+      }
+      rows.push_back(data.size()); // конец строки i = начало строки i + 1
+    }
+  }
+
+  // конструктор копирования, оператор присваивания и деструктор не нужны, все поля - std::vector и size_t, поэтому копирование, освобождение памяти выполняются методами std::vector
+
+  size_t getRows() const noexcept { return n; }
+  size_t getCols() const noexcept { return m; }
+  size_t nonZeroCount() const noexcept { return data.size(); } //число не нулевых эл-тов в матрице
+
+  bool operator==(const SparseMatrix& a) const noexcept
+  {
+    return n == a.n && m == a.m && rows == a.rows && cols == a.cols && data == a.data; // идёт слева направо, если где-то встречается несоответствие возвращается false
+  }
+  bool operator!=(const SparseMatrix& a) const noexcept
+  {
+    return !(*this == a);
+  }
+
+  T at(size_t i, size_t j) const
+  {
+    if (i >= n || j >= m) {
+      throw out_of_range("Matrix index out of bounds");
+    }
+    for (int k = rows[i]; k < rows[i + 1]; k++) {
+      if (cols[k] == static_cast<int>(j)) {
+        return data[k];
+      }
+    }
+    return T(); // не нашли, значит там ноль
+  }
+
+  void set(size_t i, size_t j, const T& val)
+  {
+    if (i >= n || j >= m) {
+      throw out_of_range("Matrix index out of bounds");
+    }
+
+    int k = rows[i];
+    while (k < rows[i + 1] && cols[k] < static_cast<int>(j)) {
+      k++; // ищем место, где должен стоять столбец j
+    }
+    bool found = (k < rows[i + 1] && cols[k] == static_cast<int>(j));
+
+    if (found && val != T()) {
+      data[k] = val;                                   // просто меняем
+    }
+    else if (found) {
+      data.erase(data.begin() + k);                    // записали ноль - удаляем
+      cols.erase(cols.begin() + k);
+      for (size_t r = i + 1; r <= n; r++) rows[r]--;
+    }
+    else if (val != T()) {
+      data.insert(data.begin() + k, val);              // был ноль - вставляем
+      cols.insert(cols.begin() + k, static_cast<int>(j));
+      for (size_t r = i + 1; r <= n; r++) rows[r]++;
+    }
+  }
+
+  SparseMatrix operator*(const T& val) const
+  {
+    if (val == T()) {
+      return SparseMatrix(n, m); // умножили на ноль: матрица пустая
+    }
+    SparseMatrix res(*this);
+    for (size_t k = 0; k < res.data.size(); k++) {
+      res.data[k] = res.data[k] * val;
+    }
+    return res;
+  }
+
+  SparseMatrix operator+(const SparseMatrix& b) const {
+    if (n != b.n || m != b.m) {
+      throw out_of_range("Matrix size mismatch");
+    }
+    SparseMatrix res(n, m);
+    for (size_t i = 0; i < n; i++) {
+      vector<T> row(m); // строка из нулей
+
+      for (int k = rows[i]; k < rows[i + 1]; k++) {
+        row[cols[k]] += data[k];
+      }
+      for (int k = b.rows[i]; k < b.rows[i + 1]; k++) {
+        row[b.cols[k]] += b.data[k];
+      }
+
+      for (size_t j = 0; j < m; j++) { // оставляем только ненулевые
+        if (row[j] != T()) {
+          res.data.push_back(row[j]);
+          res.cols.push_back(static_cast<int>(j));
+        }
+      }
+      res.rows[i + 1] = res.data.size();
+    }
+    return res;
+  }
+
+  SparseMatrix operator-(const SparseMatrix& b) const {
+    if (n != b.n || m != b.m) {
+    throw out_of_range("Matrix size mismatch");
+  }
+    SparseMatrix res(n, m);
+    for (size_t i = 0; i < n; i++) {
+      vector<T> row(m); // строка из нулей
+
+      for (int k = rows[i]; k < rows[i + 1]; k++) {
+        row[cols[k]] += data[k];
+      }
+      for (int k = b.rows[i]; k < b.rows[i + 1]; k++) {
+        row[b.cols[k]] -= b.data[k];
+      }
+
+      for (size_t j = 0; j < m; j++) { // оставляем только ненулевые
+        if (row[j] != T()) {
+          res.data.push_back(row[j]);
+          res.cols.push_back(static_cast<int>(j));
+        }
+      }
+      res.rows[i + 1] = res.data.size();
+    }
+    return res;}
+
+  TDynamicVector<T> operator*(const TDynamicVector<T>& v) const
+  {
+    if (m != v.size()) {
+      throw out_of_range("Vector size mismatch");
+    }
+    TDynamicVector<T> res(n);
+    for (size_t i = 0; i < n; i++) {
+      for (int k = rows[i]; k < rows[i + 1]; k++) {
+        res[i] += data[k] * v[cols[k]];
+      }
+    }
+    return res;
+  }
+
+  friend istream& operator>>(istream& istr, SparseMatrix& a)
+  {
+    a.data.clear();
+    a.cols.clear();
+    a.rows.assign(1, 0);
+    for (size_t i = 0; i < a.n; i++) {
+      for (size_t j = 0; j < a.m; j++) {
+        T x;
+        istr >> x; // требуется оператор>> для типа T
+        if (x != T()) {
+          a.data.push_back(x);
+          a.cols.push_back(static_cast<int>(j));
+        }
+      }
+      a.rows.push_back(a.data.size());
+    }
+    return istr;
+  }
+
+  friend ostream& operator<<(ostream& ostr, const SparseMatrix& a)
+  {
+    for (size_t i = 0; i < a.n; i++) {
+      int k = a.rows[i];
+      for (size_t j = 0; j < a.m; j++) {
+        if (k < a.rows[i + 1] && a.cols[k] == static_cast<int>(j)) {
+          ostr << a.data[k] << ' ';
+          k++;
+        }
+        else {
+          ostr << T() << ' ';
+        }
+      }
+      ostr << '\n';
+    }
+    return ostr;
+  }
+
 };
 
 #endif
