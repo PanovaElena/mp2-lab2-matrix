@@ -516,8 +516,28 @@ class TCSRmatrix{
             start_this++;
           }
       }
+
+      //остатки, всегда будет работать один из циклов 
+      while (start_this < end_this){
+        tmp.col_index.push_back(col_index[start_this]);
+        tmp.values.push_back(values[start_this]);
+
+        start_this++;
+      }
+
+      while (start_m < end_m){
+        tmp.col_index.push_back(m.col_index[start_m]);
+        tmp.values.push_back(m.values[start_m]);
+
+        start_m++;
+      }
+
+      tmp.row_ptr[i + 1] = tmp.values.size(); 
     }
+
+    return tmp;
   }
+
   TCSRmatrix operator-(const TCSRmatrix<T>& m) const{
 
     if (row_count != m.row_count || col_count != m.col_count){
@@ -586,6 +606,7 @@ class TCSRmatrix{
 
     return tmp;
   }
+
   TCSRmatrix operator*(const T& val) const{
 
     if (val != T{}){
