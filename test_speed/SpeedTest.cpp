@@ -1,60 +1,61 @@
 #include "../include/tmatrix.h"
 #include <iostream>
-#include <chrono>
 #include <iomanip>
-#include <cmath>
+#include <cstdlib>
 
 using namespace std;
 
-// Функция для замера времени в миллисекундах
-template<typename Func>
-double measureTime(Func func, int iterations = 3)
-{
-    double totalMs = 0.0;
-    for (int i = 0; i < iterations; i++)
-    {
-        auto start = chrono::high_resolution_clock::now();
-        func();
-        auto end = chrono::high_resolution_clock::now();
-        totalMs += chrono::duration<double, milli>(end - start).count();
-    }
-    return totalMs / iterations;
-}
-
-// Заполнение матрицы случайными числами
 template<typename T>
 void fillMatrix(TDynamicMatrix<T>& m)
 {
     size_t n = m.size();
     for (size_t i = 0; i < n; i++)
         for (size_t j = 0; j < n; j++)
-            m[i][j] = static_cast<T>(rand() % 100 + 1); // от 1 до 100
+            m[i][j] = static_cast<T>(rand() % 100 + 1);
 }
-//Запускать в release
+
 int main()
 {
     setlocale(LC_ALL, "");
-    srand(42); // фиксируем seed для воспроизводимости
-
-    // Размеры матриц, которые будем тестировать
-    size_t sizes[] = { 100, 200, 300, 400, 500 };
-
-    // Размеры блоков, которые будем тестировать
-    size_t blockSizes[] = { 8, 16, 32, 64, 128 };
+    srand(42);
 
     cout << "=== Бенчмарк умножения матриц ===" << endl;
-    cout << "Тип данных: double" << endl;
-    cout << "Итераций для замера: 3" << endl << endl;
+    cout << "Тип данных: double" << endl << endl;
 
-    // Заголовок таблицы
+    cout << "Запуск автотюнера (тест на матрице 256x256)..." << endl;
+    size_t autoBlockSize = TDynamicMatrix<double>::FindOptimalBlockSize();
+    cout << "Автотюнер выбрал размер блока: " << autoBlockSize << "\n\n";
+
+    cout << "--- Проверка автотюнера на матрице 500x500 ---" << endl;
+    TDynamicMatrix<double> TestA(500), TestB(500);
+    fillMatrix(TestA);
+    fillMatrix(TestB);
+
+    size_t checkCandidates[] = { 16, 32, 64, 96, 128, 192, 256 };
+    for (size_t bs : checkCandidates)
+    {
+        double t = TDynamicMatrix<double>::MeasureTime([&]() {
+            auto C = TestA.BlockedMultiply(TestB, bs);
+            (void)C;
+            }, 3);
+
+        cout << "  Блок " << setw(3) << bs << ": " << fixed << setprecision(2) << t << " ms" << endl;
+    }
+    cout << "----------------------------------------------\n\n";
+
+    size_t sizes[] = { 100, 200, 300, 400, 500 };
+    size_t fixedBlockSize = 64;
+
     cout << left << setw(8) << "Size"
-        << setw(15) << "simple (ms)"
-        << setw(15) << "Permutation"
-        << setw(15) << "Blocked"
-        << setw(12) << "Best Block"
-        << setw(12) << "Speedup"
+        << setw(12) << "Simple"
+        << setw(12) << "Permut."
+        << setw(12) << "Block(Auto)"
+        << setw(12) << "Block(64)"
+        << setw(12) << "Speed(Perm)"
+        << setw(12) << "Speed(Auto)"
+        << setw(12) << "Speed(64)"
         << endl;
-    cout << string(75, '-') << endl;
+    cout << string(92, '-') << endl;
 
     for (size_t n : sizes)
     {
@@ -62,48 +63,41 @@ int main()
         fillMatrix(A);
         fillMatrix(B);
 
-        // 1. Наивное умножение
-        double timeNaive = measureTime([&]() {
+        double timeNaive = TDynamicMatrix<double>::MeasureTime([&]() {
             auto C = A.SimpleMultiply(B);
             (void)C;
-            });
+            }, 3);
 
-        // 2. С перестановкой циклов
-        double timeReordered = measureTime([&]() {
+        double timeReordered = TDynamicMatrix<double>::MeasureTime([&]() {
             auto C = A.PermutationMultiply(B);
             (void)C;
-            });
+            }, 3);
 
-        // 3. Блочное — ищем лучший блок
-        double bestBlockTime = 1e18;
-        size_t bestBlockSize = 0;
+        double timeBlockedAuto = TDynamicMatrix<double>::MeasureTime([&]() {
+            auto C = A.BlockedMultiply(B, autoBlockSize);
+            (void)C;
+            }, 3);
 
-        for (size_t bs : blockSizes)
-        {
-            if (bs > n) continue; // блок больше матрицы — пропускаем
+        double timeBlockedFixed = TDynamicMatrix<double>::MeasureTime([&]() {
+            auto C = A.BlockedMultiply(B, fixedBlockSize);
+            (void)C;
+            }, 3);
 
-            double t = measureTime([&]() {
-                auto C = A.BlockedMultiply(B, bs);
-                (void)C;
-                });
-
-            if (t < bestBlockTime)
-            {
-                bestBlockTime = t;
-                bestBlockSize = bs;
-            }
-        }
-
-        // Считаем ускорение относительно простого
-        double speedup = timeNaive / bestBlockTime;
+        // Считаем ускорения
+        double speedPerm = timeNaive / timeReordered;
+        double speedAuto = timeNaive / timeBlockedAuto;
+        double speedFixed = timeNaive / timeBlockedFixed;
 
         cout << left << setw(8) << n
-            << setw(15) << fixed << setprecision(2) << timeNaive
-            << setw(15) << timeReordered
-            << setw(15) << bestBlockTime
-            << setw(10) << bestBlockSize
-            << setw(15) << setprecision(2) << speedup
+            << setw(12) << fixed << setprecision(2) << timeNaive
+            << setw(12) << timeReordered
+            << setw(12) << timeBlockedAuto
+            << setw(12) << timeBlockedFixed
+            << setw(12) << speedPerm 
+            << setw(12) << speedAuto 
+            << setw(12) << speedFixed 
             << endl;
     }
+
     return 0;
 }
