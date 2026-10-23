@@ -8,6 +8,8 @@
 #define __TDynamicMatrix_H__
 
 #include <iostream>
+#include <chrono>
+#include <cstdlib>
 
 using namespace std;
 
@@ -235,7 +237,71 @@ class TDynamicMatrix : private TDynamicVector<TDynamicVector<T>>
 {
   using TDynamicVector<TDynamicVector<T>>::pMem;
   using TDynamicVector<TDynamicVector<T>>::sz;
+
+  
 public:
+    //запоминает лучший размер блока для данного типа T
+    static size_t bestBlockSize;
+
+    //метод для замера времени
+    template<typename Func>
+    static double MeasureTime(Func func, int iterations = 2)
+    {
+        double totalMs = 0.0;
+        for (int i = 0; i < iterations; i++)
+        {
+            auto start = std::chrono::high_resolution_clock::now();
+            func();
+            auto end = std::chrono::high_resolution_clock::now();
+            totalMs += std::chrono::duration<double, std::milli>(end - start).count();
+        }
+        return totalMs / iterations;
+    }
+
+    //автоматический подбор блока
+    static size_t FindOptimalBlockSize()
+    {
+        //если размер матрицы маленький, блок не нужен
+        const size_t TEST_SIZE = 128;
+
+        TDynamicMatrix<T> A(TEST_SIZE), B(TEST_SIZE);
+
+        //заполняем тестовые матрицы случайными числами
+        for (size_t i = 0; i < TEST_SIZE; i++) {
+            for (size_t j = 0; j < TEST_SIZE; j++) {
+                A[i][j] = static_cast<T>(rand() % 100);
+                B[i][j] = static_cast<T>(rand() % 100);
+            }
+        }
+        //выполняем умножение 3 раза, чтобы процессор вышел на рабочую частоту
+        //а данные загрузились в кэш
+        for (int w = 0; w < 3; w++) {
+            TDynamicMatrix<T> WarmUp = A.BlockedMultiply(B, 32);
+            (void)WarmUp;
+        }
+
+        //кандидаты на лучший размер блока
+        size_t candidates[] = { 16, 32, 48, 64, 96, 128, 192, 256 };
+        size_t bestSize = 32;
+        double bestTime = 1e18;
+
+        for (size_t bs : candidates)
+        {
+            if (bs > TEST_SIZE) continue;
+
+            double time = MeasureTime([&]() {
+                TDynamicMatrix<T> C = A.BlockedMultiply(B, bs);
+                (void)C; // чтобы компилятор не выкинул вычисления
+                });
+
+            if (time < bestTime) {
+                bestTime = time;
+                bestSize = bs;
+            }
+        }
+        return bestSize;
+    }
+
   TDynamicMatrix(size_t s = 1) : TDynamicVector<TDynamicVector<T>>(s)
   {
       if (sz > MAX_MATRIX_SIZE)
@@ -370,10 +436,14 @@ public:
       return res;
   }
 
-  TDynamicMatrix BlockedMultiply(const TDynamicMatrix& m, size_t blockSize) const
+  TDynamicMatrix BlockedMultiply(const TDynamicMatrix& m, size_t blockSize = 0) const
   {
       if (sz != m.sz)
           throw out_of_range("Size mismatch");
+
+      if (blockSize == 0)
+          blockSize = bestBlockSize;
+
       if (blockSize == 0)
           throw out_of_range("Block size must be > 0");
 
@@ -430,6 +500,10 @@ public:
 
       return ostr;
   }
+
 };
+
+template<typename T>
+size_t TDynamicMatrix<T>::bestBlockSize = 0;
 
 #endif
