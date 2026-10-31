@@ -201,13 +201,13 @@ class TDynamicVector
     friend std::istream& operator>>(std::istream& istr, TDynamicVector& v)
     {
       for (size_t i = 0; i < v.sz; i++)
-        istr >> v.pMem[i]; // требуется оператор>> для типа T
+        istr >> v.pMem[i]; 
       return istr;
     }
     friend std::ostream& operator<<(std::ostream& ostr, const TDynamicVector& v)
     {
       for (size_t i = 0; i < v.sz; i++)
-        ostr << v.pMem[i] << ' '; // требуется оператор<< для типа T
+        ostr << v.pMem[i] << ' '; 
       return ostr;
     }
 };
@@ -347,7 +347,7 @@ public:
   friend std::ostream& operator<<(std::ostream& ostr, const TDynamicMatrix& v)
   {
     for (size_t i = 0; i < v.sz; i++){
-      ostr << v[i] << '\n';
+      ostr << v[i] << ' ';
     }
 
     return ostr;

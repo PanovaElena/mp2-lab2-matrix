@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <sstream>
 #include "gtest.h"
 #include "tmatrix.h"
@@ -26,12 +27,31 @@ TEST(TDynamicVector, can_create_copied_vector)
 
 TEST(TDynamicVector, can_move_vector_using_move_constructor)
 {
-  ADD_FAILURE();
+  TDynamicVector<int> v1(5);
+  v1[0] = 42;
+  int* original_mem_address = &v1[0];
+
+  TDynamicVector<int> v2(std::move(v1));
+
+  EXPECT_EQ(v2.size(), 5);
+  EXPECT_EQ(v2[0], 42);
+  EXPECT_EQ(&v2[0], original_mem_address);
+  EXPECT_EQ(v1.size(), 0);
 }
 
 TEST(TDynamicVector, can_move_vector_using_move_operator)
 {
-  ADD_FAILURE();
+  TDynamicVector<int> v1(5);
+  v1[0] = 42;
+  int* original_mem_address = &v1[0];
+
+  TDynamicVector<int> v2(3);
+  v2 = std::move(v1);
+
+  EXPECT_EQ(v2.size(), 5);
+  EXPECT_EQ(v2[0], 42);
+  EXPECT_EQ(&v2[0], original_mem_address);
+  EXPECT_EQ(v1.size(), 0);
 }
 
 TEST(TDynamicVector, copied_vector_is_equal_to_source_one)
@@ -268,25 +288,13 @@ TEST(TDynamicVector, cant_multiply_vectors_with_not_equal_size)
 
   ASSERT_ANY_THROW(v * v1);
 }
-TEST(TDynamicVector, move_constructor_steals_memory_and_nullifies_source)
-{
-  TDynamicVector<int> v1(5);
-  v1[0] = 42;
-  int* original_mem_address = &v1[0];
 
-  TDynamicVector<int> v2(std::move(v1));
-
-  EXPECT_EQ(v2.size(), 5);
-  EXPECT_EQ(v2[0], 42);
-  EXPECT_EQ(&v2[0], original_mem_address);
-  EXPECT_EQ(v1.size(), 0);
-}
 
 TEST(TDynamicVector, can_read_vector)
 {
   TDynamicVector<int> v(5);
   TDynamicVector<int> expected(5);
-  for (int i = 0; i < 5; i++) expected[i] = i;
+  for (size_t i = 0; i < 5; i++) expected[i] = i + 1;
   
   std::stringstream sstr;
   sstr << "1 2 3 4 5\n";
@@ -297,8 +305,8 @@ TEST(TDynamicVector, can_read_vector)
 
 TEST(TDynamicVector, can_write_vector)
 {
-  TDynamicVector<int> v;
-  for (int i = 0; i < 5; i++) v[i] = i;
+  TDynamicVector<int> v(5);
+  for (size_t i = 0; i < 5; i++) v[i] = i + 1;
   std::string expected = "1 2 3 4 5 ";
   
   std::stringstream sstr;
