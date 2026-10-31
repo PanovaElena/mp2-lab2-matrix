@@ -8,6 +8,7 @@
 #define __TDynamicMatrix_H__
 
 #include <iostream>
+#include <stdexcept>
 
 const int MAX_VECTOR_SIZE = 100000000;
 const int MAX_MATRIX_SIZE = 10000;
@@ -24,10 +25,10 @@ public:
   TDynamicVector(size_t size = 1) : sz(size)
   {
     if (sz == 0) {
-      throw out_of_range("Vector size should be greater than zero");
+      throw std::out_of_range("Vector size should be greater than zero");
     }
     if (sz > MAX_VECTOR_SIZE) {
-      throw out_of_range("Vector size is too large");
+      throw std::out_of_range("Vector size is too large");
     }
     pMem = new T[sz]();// {}; // У типа T д.б. констуктор по умолчанию
   }
@@ -93,14 +94,14 @@ public:
   T& at(size_t ind)
   {
     if (ind >= sz) {
-      throw out_of_range("The index should be less than the size of vector");
+      throw std::out_of_range("The index should be less than the size of vector");
     }
     return pMem[ind];
   }
   const T& at(size_t ind) const
   {
     if (ind >= sz) {
-      throw out_of_range("The index should be less than the size of vector");
+      throw std::out_of_range("The index should be less than the size of vector");
     }
     return pMem[ind];
   }
@@ -153,7 +154,7 @@ public:
   TDynamicVector operator+(const TDynamicVector& v)
   {
     if (sz != v.sz) {
-      throw invalid_argument("Vectors must have equal sizes");
+      throw std::invalid_argument("Vectors must have equal sizes");
     }
       TDynamicVector result(sz);
       for (size_t i = 0; i < sz; i++) {
@@ -164,7 +165,7 @@ public:
   TDynamicVector operator-(const TDynamicVector& v)
   {
     if (sz != v.sz) {
-      throw invalid_argument("Vectors must have equal sizes");
+      throw std::invalid_argument("Vectors must have equal sizes");
     }
       TDynamicVector result(sz);
       for (size_t i = 0; i < sz; i++) {
@@ -175,7 +176,7 @@ public:
   T operator*(const TDynamicVector& v)
   {
     if (sz != v.sz) {
-      throw invalid_argument("Vectors must have equal sizes");
+      throw std::invalid_argument("Vectors must have equal sizes");
     }
     T result = T();
     for (size_t i = 0; i < sz; i++) {
@@ -217,7 +218,7 @@ public:
   TDynamicMatrix(size_t s = 1) : TDynamicVector<TDynamicVector<T>>(s)
   {
     if (sz > MAX_MATRIX_SIZE) {
-      throw out_of_range("Matrix size is too large");
+      throw std::out_of_range("Matrix size is too large");
     }
     for (size_t i = 0; i < sz; i++)
       pMem[i] = TDynamicVector<T>(sz);
@@ -252,7 +253,7 @@ public:
   TDynamicVector<T> operator*(const TDynamicVector<T>& v)
   {
     if (sz != v.size()) {
-      throw invalid_argument("Matrix and vector sizes must be equal");
+      throw std::invalid_argument("Matrix and vector sizes must be equal");
     }
     TDynamicVector<T> result(sz);
     for (size_t i = 0; i < sz; i++) {
@@ -270,7 +271,7 @@ public:
   TDynamicMatrix operator+(const TDynamicMatrix& m)
   {
     if (sz != m.sz) {
-      throw invalid_argument("Matrices must have equal sizes");
+      throw std::invalid_argument("Matrices must have equal sizes");
     }
     TDynamicMatrix result(sz);
     for (size_t i = 0; i < sz; i++) {
@@ -281,7 +282,7 @@ public:
   TDynamicMatrix operator-(const TDynamicMatrix& m)
   {
     if (sz != m.sz) {
-      throw invalid_argument("Matrices must have equal sizes");
+      throw std::invalid_argument("Matrices must have equal sizes");
     }
     TDynamicMatrix result(sz);
     for (size_t i = 0; i < sz; i++) {
@@ -292,7 +293,7 @@ public:
   TDynamicMatrix operator*(const TDynamicMatrix& m)
   {
     if (sz != m.sz) {
-      throw invalid_argument("Matrices mudt have equal sizes");
+      throw std::invalid_argument("Matrices mudt have equal sizes");
     }
     TDynamicMatrix result(sz);
     for (size_t i = 0; i < sz; i++) {
