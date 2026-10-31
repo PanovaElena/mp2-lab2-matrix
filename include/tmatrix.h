@@ -318,7 +318,7 @@ public:
   friend std::ostream& operator<<(std::ostream& ostr, const TDynamicMatrix& v)
   {
     for (size_t i = 0; i < v.sz; i++) {
-      ostr << v.pMem[i] << endl;
+      ostr << v.pMem[i] << std::endl;
     }
     return ostr;
   }
