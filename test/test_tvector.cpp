@@ -1,3 +1,5 @@
+#include <sstream>
+#include "gtest.h"
 #include "tmatrix.h"
 
 #include <gtest.h>
@@ -22,6 +24,16 @@ TEST(TDynamicVector, can_create_copied_vector)
 {
   TDynamicVector<int> vector(123);
   ASSERT_NO_THROW(TDynamicVector<int> vector1(vector));
+}
+
+TEST(TDynamicVector, can_move_vector_using_move_constructor)
+{
+  ADD_FAILURE();
+}
+
+TEST(TDynamicVector, can_move_vector_using_move_operator)
+{
+  ADD_FAILURE();
 }
 
 TEST(TDynamicVector, copied_vector_is_equal_to_source_one)

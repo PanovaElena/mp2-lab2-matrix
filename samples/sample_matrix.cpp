@@ -6,9 +6,11 @@
 
 #include <iostream>
 #include "tmatrix.h"
+
+using namespace std;
 //---------------------------------------------------------------------------
 
-void main()
+int main()
 {
   int size, op;
 

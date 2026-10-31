@@ -9,8 +9,6 @@
 
 #include <iostream>
 
-using namespace std;
-
 const int MAX_VECTOR_SIZE = 100000000;
 const int MAX_MATRIX_SIZE = 10000;
 
@@ -193,13 +191,13 @@ public:
   }
 
   // ввод/вывод
-  friend istream& operator>>(istream& istr, TDynamicVector& v)
+  friend std::istream& operator>>(std::istream& istr, TDynamicVector& v)
   {
     for (size_t i = 0; i < v.sz; i++)
       istr >> v.pMem[i]; // требуется оператор>> для типа T
     return istr;
   }
-  friend ostream& operator<<(ostream& ostr, const TDynamicVector& v)
+  friend std::ostream& operator<<(std::ostream& ostr, const TDynamicVector& v)
   {
     for (size_t i = 0; i < v.sz; i++)
       ostr << v.pMem[i] << ' '; // требуется оператор<< для типа T
@@ -309,14 +307,14 @@ public:
   }
 
   // ввод/вывод
-  friend istream& operator>>(istream& istr, TDynamicMatrix& v)
+  friend std::istream& operator>>(std::istream& istr, TDynamicMatrix& v)
   {
     for (size_t i = 0; i < v.sz; i++) {
       istr >> v.pMem[i];
     }
     return istr;
   }
-  friend ostream& operator<<(ostream& ostr, const TDynamicMatrix& v)
+  friend std::ostream& operator<<(std::ostream& ostr, const TDynamicMatrix& v)
   {
     for (size_t i = 0; i < v.sz; i++) {
       ostr << v.pMem[i] << endl;
