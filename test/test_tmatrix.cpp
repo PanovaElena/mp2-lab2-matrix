@@ -390,3 +390,35 @@ TEST(TCSRmatrix, compare_matrices_equality_and_inequality)
   TCSRmatrix<int> m3(3, 2);
   EXPECT_FALSE(m1 == m3);
 }
+
+TEST (TCSRmatrix, add_opposite_matrices_annihilates_elements_to_zero){
+  TCSRmatrix<int> m1(2, 2);
+
+  m1.set(0, 0,1);
+  m1.set(0,1,2);
+  m1.set(1,0,3);
+  m1.set(1,1,4);
+
+  TCSRmatrix<int> m2(2,2);
+
+  EXPECT_EQ(m1 - m1, m2);
+}
+
+TEST(TCSRmatrix, can_multiply_by_vector)
+{
+  TCSRmatrix<int> m1(2, 3);
+  m1.set(0, 0, 2);
+  m1.set(0, 2, 3);
+  m1.set(1, 1, 4);
+
+  TDynamicVector<int> v1(3);
+  v1[0] = 1;
+  v1[1] = 2;
+  v1[2] = 3;
+
+  TDynamicVector<int> res = m1 * v1;
+
+  EXPECT_EQ(res.size(), 2);
+  EXPECT_EQ(res[0], 11);
+  EXPECT_EQ(res[1], 8);
+}

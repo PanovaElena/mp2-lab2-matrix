@@ -6,9 +6,11 @@
 
 #include <iostream>
 #include "tmatrix.h"
+
+using namespace std;
 //---------------------------------------------------------------------------
 
-void main()
+int main()
 {
   TDynamicMatrix<int> a(5), b(5), c(5);
   int i, j;
