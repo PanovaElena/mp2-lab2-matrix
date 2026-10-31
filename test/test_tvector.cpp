@@ -28,12 +28,35 @@ TEST(TDynamicVector, can_create_copied_vector)
 
 TEST(TDynamicVector, can_move_vector_using_move_constructor)
 {
-  ADD_FAILURE();
+  TDynamicVector<int> source(2);
+  source[0] = 10;
+  source[1] = 20;
+  int* sourceMemory = &source[0];
+
+  TDynamicVector<int> destination(std::move(source));
+
+  EXPECT_EQ(2, destination.size());
+  EXPECT_EQ(10, destination[0]);
+  EXPECT_EQ(20, destination[1]);
+  EXPECT_EQ(sourceMemory, &destination[0]);
+  EXPECT_NO_THROW(source = TDynamicVector<int>(1));
 }
 
 TEST(TDynamicVector, can_move_vector_using_move_operator)
 {
-  ADD_FAILURE();
+  TDynamicVector<int> source(2);
+  source[0] = 10;
+  source[1] = 20;
+  int* sourceMemory = &source[0];
+  TDynamicVector<int> destination(1);
+
+  destination = std::move(source);
+
+  EXPECT_EQ(2, destination.size());
+  EXPECT_EQ(10, destination[0]);
+  EXPECT_EQ(20, destination[1]);
+  EXPECT_EQ(sourceMemory, &destination[0]);
+  EXPECT_NO_THROW(source = TDynamicVector<int>(1));
 }
 
 TEST(TDynamicVector, copied_vector_is_equal_to_source_one)
