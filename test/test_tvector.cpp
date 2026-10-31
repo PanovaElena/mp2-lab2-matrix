@@ -1,6 +1,7 @@
 #include "tmatrix.h"
 
 #include <gtest.h>
+#include <utility>
 
 TEST(TDynamicVector, can_create_vector_with_positive_length)
 {
@@ -39,6 +40,48 @@ TEST(TDynamicVector, copied_vector_has_its_own_memory)
   TDynamicVector<int> vector2(vector1);
   vector1[0] = 20;
   EXPECT_NE(vector1[0], vector2[0]);
+}
+
+TEST(TDynamicVector, move_constructor_transfers_memory_and_values)
+{
+  TDynamicVector<int> source(3);
+  source[0] = 10;
+  source[1] = 20;
+  source[2] = 30;
+  int* sourceMemory = &source[0];
+
+  TDynamicVector<int> destination(std::move(source));
+
+  EXPECT_EQ(3, destination.size());
+  EXPECT_EQ(10, destination[0]);
+  EXPECT_EQ(20, destination[1]);
+  EXPECT_EQ(30, destination[2]);
+  EXPECT_EQ(sourceMemory, &destination[0]);
+
+  EXPECT_NO_THROW(source = TDynamicVector<int>(2));
+  EXPECT_EQ(2, source.size());
+}
+
+TEST(TDynamicVector, move_assignment_transfers_memory_and_values)
+{
+  TDynamicVector<int> source(3);
+  source[0] = 10;
+  source[1] = 20;
+  source[2] = 30;
+  int* sourceMemory = &source[0];
+  TDynamicVector<int> destination(1);
+  destination[0] = 99;
+
+  destination = std::move(source);
+
+  EXPECT_EQ(3, destination.size());
+  EXPECT_EQ(10, destination[0]);
+  EXPECT_EQ(20, destination[1]);
+  EXPECT_EQ(30, destination[2]);
+  EXPECT_EQ(sourceMemory, &destination[0]);
+
+  EXPECT_NO_THROW(source = TDynamicVector<int>(2));
+  EXPECT_EQ(2, source.size());
 }
 
 TEST(TDynamicVector, can_get_size)

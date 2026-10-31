@@ -1,6 +1,7 @@
 #include "tmatrix.h"
 
 #include <gtest.h>
+#include <utility>
 
 TEST(TDynamicMatrix, can_create_matrix_with_positive_length)
 {
@@ -38,6 +39,44 @@ TEST(TDynamicMatrix, copied_matrix_has_its_own_memory)
   TDynamicMatrix<int> matrix2(matrix1);
   matrix1[2][2] = 99;
   EXPECT_NE(matrix1[2][2], matrix2[2][2]);
+}
+
+TEST(TDynamicMatrix, move_constructor_transfers_memory_and_values)
+{
+  TDynamicMatrix<int> source(2);
+  source[0][0] = 10;
+  source[1][1] = 20;
+  int* sourceMemory = &source[0][0];
+
+  TDynamicMatrix<int> destination(std::move(source));
+
+  EXPECT_EQ(2, destination.size());
+  EXPECT_EQ(10, destination[0][0]);
+  EXPECT_EQ(20, destination[1][1]);
+  EXPECT_EQ(sourceMemory, &destination[0][0]);
+
+  EXPECT_NO_THROW(source = TDynamicMatrix<int>(1));
+  EXPECT_EQ(1, source.size());
+}
+
+TEST(TDynamicMatrix, move_assignment_transfers_memory_and_values)
+{
+  TDynamicMatrix<int> source(2);
+  source[0][0] = 10;
+  source[1][1] = 20;
+  int* sourceMemory = &source[0][0];
+  TDynamicMatrix<int> destination(1);
+  destination[0][0] = 99;
+
+  destination = std::move(source);
+
+  EXPECT_EQ(2, destination.size());
+  EXPECT_EQ(10, destination[0][0]);
+  EXPECT_EQ(20, destination[1][1]);
+  EXPECT_EQ(sourceMemory, &destination[0][0]);
+
+  EXPECT_NO_THROW(source = TDynamicMatrix<int>(1));
+  EXPECT_EQ(1, source.size());
 }
 
 TEST(TDynamicMatrix, can_get_size)
