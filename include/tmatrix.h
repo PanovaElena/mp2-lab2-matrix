@@ -62,7 +62,7 @@ class TDynamicVector
       if (&v == this) {return *this;}
 
       if (sz != v.sz){
-
+        
         delete [] pMem;
         pMem = new T[v.sz];
       }
