@@ -10,6 +10,9 @@ foreach(sample_filename ${samples_list})
   add_executable(${sample} ${sample_filename})
   target_include_directories(${sample} PUBLIC "${MP2_INCLUDES}")
   target_link_libraries(${sample} ${MP2_LIBRARY})
+  if(OpenMP_CXX_FOUND)
+    target_link_libraries(${sample} OpenMP::OpenMP_CXX)
+  endif()
   set_target_properties(${sample} PROPERTIES
     OUTPUT_NAME "${sample}"
     PROJECT_LABEL "${sample}"

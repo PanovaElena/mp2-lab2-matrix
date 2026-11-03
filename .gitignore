@@ -351,3 +351,11 @@ MigrationBackup/
 
 # CMake build dir
 build/
+
+
+#my ignores
+.idea/
+*.iml
+.DS_Store
+**/.DS_Store
+/configure.sh

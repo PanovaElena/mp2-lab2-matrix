@@ -1,4 +1,9 @@
-cmake_minimum_required(VERSION 3.30)
+cmake_minimum_required(VERSION 3.10)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+if(POLICY CMP0079)
+    cmake_policy(SET CMP0079 NEW)
+endif()
 
 # disable googlemock
 option(BUILD_GMOCK "Builds the googlemock subproject" OFF)
@@ -10,6 +15,13 @@ project(${PROJECT_NAME})
 
 include(CTest)
 enable_testing()  # defines BUILD_TESTING
+
+find_package(OpenMP)
+
+if(MSVC)
+    add_compile_options(/openmp:experimental)
+endif()
+
 
 set(MP2_TESTS   "test_${PROJECT_NAME}")
 set(MP2_CUSTOM_PROJECT "${PROJECT_NAME}")
@@ -29,6 +41,9 @@ if(BUILD_TESTING)
 	add_subdirectory(test)
 endif()
 
+if(TARGET ${PROJECT_NAME})
+	target_link_libraries(${PROJECT_NAME} INTERFACE OpenMP::OpenMP_CXX)
+endif()
 
 # REPORT
 message( STATUS "")
