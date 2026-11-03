@@ -309,12 +309,13 @@ public:
     if (sz != m.sz) {
       throw out_of_range("Vector size mismatch");
     }
+    const int n = static_cast<int>(sz);
     TDynamicMatrix res(sz);
 #pragma omp parallel for schedule(dynamic) // делим строки между потоками
-    for (int i = 0; i < sz; i++) {
-      for (int k = 0; k < sz; k++) {
+    for (int i = 0; i < n; i++) {
+      for (int k = 0; k < n; k++) {
 #pragma omp simd //Внутри потока включаем векторизацию, перед циклом т.к. обрабатываем сразу несколько итераций в одной процессорной инструкции
-        for (int j = 0; j < sz; j++) {
+        for (int j = 0; j < n; j++) {
           res[i][j] += pMem[i][k] * m[k][j];
         }
       }
@@ -343,14 +344,15 @@ public:
       throw out_of_range("Matrix size mismatch");
     }
     TDynamicMatrix res(sz);
-    int blocksize = 64;
-#pragma omp parallel for schedule(dynamic) // делим блоки между потоками
-    for (int ii = 0; ii < sz; ii += blocksize) {
-      int iEnd = min(sz, ii + blocksize);
-      for (int kk = 0; kk < sz; kk += blocksize) {
-        int kEnd = min(kk + blocksize, sz);
-        for (int jj = 0; jj < sz; jj += blocksize) {
-          int jEnd = min(sz, jj + blocksize);
+    const int n = static_cast<int>(sz);
+    const int blocksize = 64;
+#pragma omp parallel for schedule(dynamic)
+    for (int ii = 0; ii < n; ii += blocksize) {
+      int iEnd = std::min(ii + blocksize, n);
+      for (int kk = 0; kk < n; kk += blocksize) {
+        int kEnd = std::min(kk + blocksize, n);
+        for (int jj = 0; jj < n; jj += blocksize) {
+          int jEnd = std::min(jj + blocksize, n);
 
           for (int i = ii; i < iEnd; i++) {
             for (int k = kk; k < kEnd; k++) {
