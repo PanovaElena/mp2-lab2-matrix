@@ -373,13 +373,33 @@ TEST(TDynamicMatrix, slow_multiply_gives_same_result_as_usual_and_blocked)
 
 TEST(TDynamicMatrix, can_read_matrix)
 {
-  ADD_FAILURE();
+  TDynamicMatrix<int> expected(2);
+  expected[0][0] = 1; expected[0][1] = 2;
+  expected[1][0] = 3; expected[1][1] = 4;
+
+  TDynamicMatrix<int> m(2);
+  std::stringstream sstr;
+
+  sstr << "1 2\n3 4\n";
+  sstr >> m;
+
+  EXPECT_EQ(expected, m);
 }
 
 TEST(TDynamicMatrix, can_write_matrix)
 {
-  ADD_FAILURE();
+  TDynamicMatrix<int> m(2);
+  m[0][0] = 1; m[0][1] = 2;
+  m[1][0] = 3; m[1][1] = 4;
+
+  std::string expected = "1 2 \n3 4 \n";
+
+  std::stringstream sstr;
+  sstr << m;
+
+  EXPECT_EQ(expected, sstr.str());
 }
+
 
 // тесты для crs
 

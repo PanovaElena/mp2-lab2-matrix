@@ -24,15 +24,33 @@ TEST(TDynamicVector, can_create_copied_vector)
   ASSERT_NO_THROW(TDynamicVector<int> v1(v));
 }
 
-TEST(TDynamicVector, can_move_vector_using_move_constructor)
-{
-  ADD_FAILURE();
+TEST(TDynamicVector, can_move_vector_using_move_constructor) {
+  TDynamicVector<int> v1(10);
+  v1[0] = 42;
+  v1[1] = 100;
+
+  TDynamicVector<int> v2 = (std::move(v1));
+
+  EXPECT_EQ(42, v2[0]);
+  EXPECT_EQ(100, v2[1]);
+
+  EXPECT_EQ(v1.size(), 0);
 }
 
 TEST(TDynamicVector, can_move_vector_using_move_operator)
 {
-  ADD_FAILURE();
+  TDynamicVector<int> v1(10);
+  v1[0] = 42;
+  v1[1] = 100;
+
+  TDynamicVector<int> v2 = std::move(v1);
+
+  EXPECT_EQ(42, v2[0]);
+  EXPECT_EQ(100, v2[1]);
+
+  EXPECT_EQ(v1.size(), 0);
 }
+
 
 TEST(TDynamicVector, copied_vector_is_equal_to_source_one)
 {
@@ -69,13 +87,13 @@ TEST(TDynamicVector, can_get_size)
   EXPECT_EQ(4, v.size());
 }
 
-//TEST(TDynamicVector, can_set_and_get_element)
-//{
-//  TDynamicVector<int> v(4);
-//  v[0] = 4;
-//
-//  EXPECT_EQ(4, v[0]);
-//}
+TEST(TDynamicVector, can_set_and_get_element)
+{
+  TDynamicVector<int> v(4);
+  v[0] = 4;
+
+  EXPECT_EQ(4, v[0]);
+}
 
 TEST(TDynamicVector, throws_when_set_element_with_negative_index)
 {
@@ -304,10 +322,12 @@ TEST(TDynamicVector, cant_multiply_vectors_with_not_equal_size)
 
 TEST(TDynamicVector, can_read_vector)
 {
-  TDynamicVector<int> v(5);
   TDynamicVector<int> expected(5);
-  for (int i = 0; i < 5; i++) expected[i] = i;
-  
+  for (int i = 0; i < 5; i++) {
+    expected[i] = i + 1;
+  }
+
+  TDynamicVector<int> v(5);
   std::stringstream sstr;
   sstr << "1 2 3 4 5\n";
   sstr >> v;
@@ -317,10 +337,12 @@ TEST(TDynamicVector, can_read_vector)
 
 TEST(TDynamicVector, can_write_vector)
 {
-  TDynamicVector<int> v;
-  for (int i = 0; i < 5; i++) v[i] = i;
+  TDynamicVector<int> v(5);
+  for (int i = 0; i < 5; i++) {
+    v[i] = i + 1;
+  }
   std::string expected = "1 2 3 4 5 ";
-  
+
   std::stringstream sstr;
   sstr << v;
   
