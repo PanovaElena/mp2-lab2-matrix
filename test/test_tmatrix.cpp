@@ -311,15 +311,13 @@ TEST(TDynamicMatrix, slow_multiply_gives_correct_result)
   EXPECT_EQ(23, result[2][2]);
 }
 
-TEST(TDynamicMatrix, slow_multiply_by_identity_matrix_does_not_change_matrix)
-{
+TEST(TDynamicMatrix, slow_multiply_by_identity_matrix_does_not_change_matrix) {
   TDynamicMatrix<int> a(3), e(3);
   for (size_t i = 0; i < 3; i++) {
     e[i][i] = 1;
     for (size_t j = 0; j < 3; j++)
       a[i][j] = i * 3 + j;
   }
-
   EXPECT_EQ(a, a.slowMultiply(e));
   EXPECT_EQ(a, e.slowMultiply(a));
 }
@@ -371,6 +369,16 @@ TEST(TDynamicMatrix, slow_multiply_gives_same_result_as_usual_and_blocked)
 
   EXPECT_EQ(slow, a * b);
   EXPECT_EQ(slow, a.blockMultiply(b));
+}
+
+TEST(TDynamicMatrix, can_read_matrix)
+{
+  ADD_FAILURE();
+}
+
+TEST(TDynamicMatrix, can_write_matrix)
+{
+  ADD_FAILURE();
 }
 
 // тесты для crs
