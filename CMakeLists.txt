@@ -19,6 +19,11 @@ enable_testing()  # defines BUILD_TESTING
 
 find_package(OpenMP)
 
+if(MSVC)
+    add_compile_options(/openmp:experimental)
+endif()
+
+
 set(MP2_TESTS   "test_${PROJECT_NAME}")
 set(MP2_CUSTOM_PROJECT "${PROJECT_NAME}")
 set(MP2_INCLUDES "${PROJECT_SOURCE_DIR}/include")
