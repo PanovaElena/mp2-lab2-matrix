@@ -4,4 +4,4 @@ project(${target})
 
 file(GLOB hdrs "*.h*")
 
-add_custom_target(${target} SOURCES ${hdrs})
+add_custom_target(${target}_headers SOURCES ${hdrs})

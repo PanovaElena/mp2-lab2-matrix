@@ -15,20 +15,18 @@ set(MP2_TESTS   "test_${PROJECT_NAME}")
 set(MP2_CUSTOM_PROJECT "${PROJECT_NAME}")
 set(MP2_INCLUDES "${PROJECT_SOURCE_DIR}/include")
 
+# Header-only library
+set(MP2_LIBRARY ${MP2_CUSTOM_PROJECT})
+add_library(${MP2_LIBRARY} INTERFACE)
+target_include_directories(${MP2_LIBRARY} INTERFACE "${MP2_INCLUDES}")
+
 add_subdirectory(include)
+add_subdirectory(samples)
 
-if(BUILD_SAMPLES)
-	add_subdirectory(samples)
-endif()
-
-if(BUILD_TESTING)
-    # add googletest, version 1.18.0
-    add_subdirectory("${PROJECT_SOURCE_DIR}/gtest/googletest-1.18.0")
-    set(MP2_GTEST_INCLUDES "${gtest_SOURCE_DIR}/include/gtest")
-
-	add_subdirectory(test)
-endif()
-
+# add googletest, version 1.18.0
+add_subdirectory("${PROJECT_SOURCE_DIR}/gtest/googletest-1.18.0")
+set(MP2_GTEST_INCLUDES "${gtest_SOURCE_DIR}/include/gtest")
+add_subdirectory(test)
 
 # REPORT
 message( STATUS "")
