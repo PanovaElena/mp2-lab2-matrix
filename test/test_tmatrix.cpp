@@ -70,7 +70,9 @@ TEST(TDynamicMatrix, throws_when_set_element_with_too_large_index)
 TEST(TDynamicMatrix, can_assign_matrix_to_itself)
 {
   TDynamicMatrix<int> m(6);
-  ASSERT_NO_THROW(TDynamicMatrix<int> m(m));
+  m = m;
+  //ASSERT_NO_THROW(TDynamicMatrix<int> m(m));
+  ASSERT_NO_THROW(m);
 }
 
 TEST(TDynamicMatrix, can_assign_matrices_of_equal_size)

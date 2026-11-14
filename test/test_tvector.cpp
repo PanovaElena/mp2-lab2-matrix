@@ -95,8 +95,9 @@ TEST(TDynamicVector, throws_when_set_element_with_too_large_index)
 TEST(TDynamicVector, can_assign_vector_to_itself)
 {
 	TDynamicVector<int> v(10);
-
-	ASSERT_NO_THROW(TDynamicVector<int> v(v)); 
+	v = v;
+	//ASSERT_NO_THROW(TDynamicVector<int> v(v)); 
+	ASSERT_NO_THROW(v);
 }
 
 TEST(TDynamicVector, can_assign_vectors_of_equal_size)
